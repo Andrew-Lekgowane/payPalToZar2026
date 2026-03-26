@@ -22,6 +22,7 @@ import {
   RotateCcw,
   Banknote,
   Filter,
+  X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/layout/Navbar";
@@ -114,6 +115,7 @@ export default function AdminPage() {
   const [userDeleting, setUserDeleting] = useState(false);
   const [pendingAction, setPendingAction] = useState<{ type: "status"; value: string } | null>(null);
   const [pendingUserAction, setPendingUserAction] = useState<{ type: "delete" } | { type: "role"; value: string } | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -515,11 +517,18 @@ export default function AdminPage() {
                   </button>
                 </div>
                 {showScreenshot && (
-                  <img
-                    src={selectedTx.proofScreenshot}
-                    alt="Payment proof"
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-700 max-h-80 object-contain bg-gray-100 dark:bg-gray-800"
-                  />
+                  <div className="relative group cursor-zoom-in" onClick={() => setLightboxOpen(true)}>
+                    <img
+                      src={selectedTx.proofScreenshot}
+                      alt="Payment proof"
+                      className="w-full rounded-xl border border-gray-200 dark:border-gray-700 max-h-72 object-contain bg-gray-100 dark:bg-gray-800"
+                    />
+                    <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-semibold bg-black/60 px-3 py-1.5 rounded-lg">
+                        Click to view full size
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
             ) : (
@@ -725,6 +734,30 @@ export default function AdminPage() {
           </div>
         )}
       </Modal>
+
+      {/* ─── Screenshot Lightbox ─── */}
+      {lightboxOpen && selectedTx?.proofScreenshot && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <p className="absolute top-4 left-1/2 -translate-x-1/2 text-white/60 text-sm">
+            Click anywhere to close
+          </p>
+          <img
+            src={selectedTx.proofScreenshot}
+            alt="Payment proof — full size"
+            className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </>
   );
 }

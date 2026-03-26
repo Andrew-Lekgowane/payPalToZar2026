@@ -157,6 +157,16 @@ export default function DashboardPage() {
     setCopied(false);
   };
 
+  // Opens the wizard keeping whatever amount the user already typed in the calculator
+  const openConvertWithAmount = () => {
+    setConvertStep(1);
+    setScreenshotFile("");
+    setScreenshotName("");
+    setTxId("");
+    setCopied(false);
+    setShowConvert(true);
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, setter: (v: string) => void, nameSetter: (v: string) => void) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -289,6 +299,13 @@ export default function DashboardPage() {
   const previewUSD = parseFloat(amountUSD) || 0;
   const previewFee = (previewUSD * SERVICE_FEE_PERCENT) / 100;
   const previewZAR = ((previewUSD - previewFee) * EXCHANGE_RATE).toFixed(2);
+  const amountError = amountUSD
+    ? previewUSD < MIN_AMOUNT_USD
+      ? `Minimum amount is $${MIN_AMOUNT_USD} USD`
+      : previewUSD > MAX_AMOUNT_USD
+      ? `Maximum is $${MAX_AMOUNT_USD} USD per transaction`
+      : null
+    : null;
 
   if (status === "loading" || loading) {
     return (
@@ -400,9 +417,16 @@ export default function DashboardPage() {
                     placeholder="e.g. 50"
                     value={amountUSD}
                     onChange={(e) => setAmountUSD(e.target.value)}
-                    className="w-full pl-7 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    className={`w-full pl-7 pr-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 transition-colors ${
+                      amountError
+                        ? "border-red-400 dark:border-red-500 focus:ring-red-500/20"
+                        : "border-gray-200 dark:border-gray-700 focus:ring-violet-500"
+                    }`}
                   />
                 </div>
+                {amountError && (
+                  <p className="text-xs text-red-500 font-medium mt-1">{amountError}</p>
+                )}
               </div>
               <div className="flex-1 p-3 rounded-xl bg-gray-50 dark:bg-gray-800 space-y-1.5 text-sm">
                 <div className="flex justify-between text-gray-500">
@@ -420,7 +444,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
               </div>
-              <Button size="sm" onClick={() => { resetConvertModal(); setShowConvert(true); }}>
+              <Button size="sm" onClick={openConvertWithAmount}>
                 <Plus className="w-4 h-4 mr-1" />
                 Convert Now
               </Button>
@@ -609,11 +633,19 @@ export default function DashboardPage() {
                   placeholder="e.g. 50"
                   value={amountUSD}
                   onChange={(e) => setAmountUSD(e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-lg font-semibold focus:outline-none focus:border-violet-500"
+                  className={`w-full pl-9 pr-4 py-3 rounded-xl border-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-lg font-semibold focus:outline-none transition-colors ${
+                    amountError
+                      ? "border-red-400 dark:border-red-500 focus:border-red-500"
+                      : "border-gray-200 dark:border-gray-700 focus:border-violet-500"
+                  }`}
                   autoFocus
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1.5">Minimum: $5 &nbsp;|&nbsp; Maximum: $100</p>
+              {amountError ? (
+                <p className="text-sm text-red-500 font-semibold mt-1.5">⚠️ {amountError}</p>
+              ) : (
+                <p className="text-xs text-gray-400 mt-1.5">Minimum: $5 &nbsp;|&nbsp; Maximum: $100</p>
+              )}
             </div>
 
             {previewUSD >= MIN_AMOUNT_USD && previewUSD <= MAX_AMOUNT_USD && (
@@ -634,7 +666,7 @@ export default function DashboardPage() {
               </div>
             )}
 
-            <Button fullWidth onClick={handleStep1Next} disabled={!amountUSD}>
+            <Button fullWidth onClick={handleStep1Next} disabled={!amountUSD || !!amountError}>
               Looks good, next step
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
