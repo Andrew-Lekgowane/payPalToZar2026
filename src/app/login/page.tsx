@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Mail, Lock, Zap } from "lucide-react";
 import toast from "react-hot-toast";
 import Button from "@/components/ui/Button";
@@ -37,7 +37,9 @@ export default function LoginPage() {
         toast.error(res.error);
       } else {
         toast.success("Welcome back!");
-        router.push("/dashboard");
+        const session = await getSession();
+        const role = (session?.user as { role?: string })?.role;
+        router.push(role === "admin" ? "/admin" : "/dashboard");
         router.refresh();
       }
     } catch {
@@ -62,7 +64,7 @@ export default function LoginPage() {
             <div className="w-10 h-10 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">PayZar</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">Annathan Pay</span>
           </Link>
           <Heading as="h3" className="mb-2">
             Welcome Back

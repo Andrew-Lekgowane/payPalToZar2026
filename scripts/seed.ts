@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import bcrypt from 'bcryptjs';
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/paypal-to-zar";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/annathan-pay";
 
 async function seed() {
   console.log("Connecting to database...");
@@ -17,7 +17,7 @@ async function seed() {
     const seedUsers = [
       {
         name: "Admin User",
-        email: "admin@payzar.co.za",
+        email: "admin@annathanpay.co.za",
         phone: "0720000000",
         password: defaultPassword,
         role: "admin",
@@ -51,7 +51,7 @@ async function seed() {
 
     console.log("✅ Seed completed successfully!");
     console.log("----------------------------------------");
-    console.log("Admin login: admin@payzar.co.za / password123");
+    console.log("Admin login: admin@annathanpay.co.za / password123");
     console.log("User login:  user@example.com / password123");
     console.log("----------------------------------------");
 

@@ -46,23 +46,26 @@ export default function Modal({
       <div
         className={`
           relative w-full ${sizeStyles[size]} bg-white dark:bg-gray-900
-          rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200
+          rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200
+          max-h-[90vh] flex flex-col
         `}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
           {title && (
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white pr-4">
               {title}
             </h2>
           )}
           <button
             onClick={onClose}
-            className="ml-auto p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-300 transition-colors"
+            className="ml-auto p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-300 transition-colors shrink-0"
           >
             <X size={20} />
           </button>
         </div>
-        {children}
+        <div className="overflow-y-auto p-6 pt-4">
+          {children}
+        </div>
       </div>
     </div>
   );

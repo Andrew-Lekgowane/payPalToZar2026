@@ -76,7 +76,7 @@ export default function RegisterPage() {
             <div className="w-10 h-10 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">PayZar</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">Annathan Pay</span>
           </Link>
           <Heading as="h3" className="mb-2">
             Create Your Account

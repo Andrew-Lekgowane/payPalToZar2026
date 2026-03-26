@@ -20,7 +20,7 @@ export default function Navbar() {
               <Zap className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">
-              PayZar
+              Annathan Pay
             </span>
           </Link>
 
@@ -54,7 +54,7 @@ export default function Navbar() {
                   </span>
                 </div>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
+                  onClick={() => signOut({ callbackUrl: "/login" })}
                   className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
                   title="Sign out"
                 >
@@ -113,7 +113,7 @@ export default function Navbar() {
                   </Link>
                   <button
                     onClick={() => {
-                      signOut({ callbackUrl: "/" });
+                      signOut({ callbackUrl: "/login" });
                       setMobileOpen(false);
                     }}
                     className="px-3 py-2 text-sm font-medium text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 text-left"

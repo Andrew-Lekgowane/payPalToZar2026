@@ -22,7 +22,7 @@ export default function TermsPage() {
                 1. Acceptance of Terms
               </h2>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                By accessing or using the PayZar service, you agree to be bound
+                By accessing or using the Annathan Pay service, you agree to be bound
                 by these Terms of Service. If you do not agree with any part of
                 these terms, you may not use our service.
               </p>
@@ -33,7 +33,7 @@ export default function TermsPage() {
                 2. Service Description
               </h2>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                PayZar provides a currency conversion service that allows users
+                Annathan Pay provides a currency conversion service that allows users
                 to convert PayPal (USD) balances into South African Rand (ZAR)
                 deposited directly into their South African bank accounts. We act
                 as an intermediary facilitating these transactions.
@@ -78,10 +78,10 @@ export default function TermsPage() {
                   creation and are subject to change.
                 </li>
                 <li>
-                  A service fee of 2.5% is applied to each transaction.
+                  A service fee of 35% is applied to each transaction.
                 </li>
                 <li>
-                  PayZar reserves the right to decline any transaction that
+                  Annathan Pay reserves the right to decline any transaction that
                   appears suspicious or violates these terms.
                 </li>
               </ul>
@@ -101,7 +101,7 @@ export default function TermsPage() {
                   unauthorized sources.
                 </li>
                 <li>
-                  PayZar is not liable for delays caused by banks or payment
+                  Annathan Pay is not liable for delays caused by banks or payment
                   processors.
                 </li>
                 <li>
@@ -140,10 +140,10 @@ export default function TermsPage() {
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 If you have any questions about these Terms, please contact us at{" "}
                 <a
-                  href="mailto:support@payzar.co.za"
+                  href="mailto:support@annathanpay.co.za"
                   className="text-violet-600 hover:text-violet-700 dark:text-violet-400 font-medium"
                 >
-                  support@payzar.co.za
+                  support@annathanpay.co.za
                 </a>
                 .
               </p>

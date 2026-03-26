@@ -16,13 +16,13 @@ const testimonials = [
   {
     name: "Thandi K.",
     location: "Cape Town",
-    text: "Best rates I&apos;ve found in SA. Been using PayZar for 6 months now and never had an issue. Their support team is amazing!",
+    text: "Best rates I&apos;ve found in SA. Been using Annathan Pay for 6 months now and never had an issue. Their support team is amazing!",
     rating: 5,
   },
   {
     name: "James P.",
     location: "Durban",
-    text: "As a Fiverr seller, I need to convert PayPal to ZAR regularly. PayZar makes it so easy. Same-day payouts every time!",
+    text: "As a Fiverr seller, I need to convert PayPal to ZAR regularly. Annathan Pay makes it so easy. Same-day payouts every time!",
     rating: 5,
   },
   {
@@ -42,7 +42,7 @@ export default function Testimonials() {
             What Our Users Say
           </Heading>
           <SubHeading className="max-w-2xl mx-auto">
-            Join thousands of South Africans who trust PayZar for their PayPal withdrawals
+            Join thousands of South Africans who trust Annathan Pay for their PayPal withdrawals
           </SubHeading>
         </div>
 

@@ -13,7 +13,7 @@ export default function Footer() {
               <div className="w-9 h-9 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">PayZar</span>
+              <span className="text-xl font-bold text-white">Annathan Pay</span>
             </div>
             <p className="text-sm leading-relaxed">
               Withdraw your PayPal money in South Africa fast and easy. Get ZAR
@@ -72,7 +72,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-sm">
                 <Mail className="w-4 h-4 text-violet-400" />
-                support@payzar.co.za
+                support@annathanpay.co.za
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Phone className="w-4 h-4 text-violet-400" />
@@ -84,10 +84,10 @@ export default function Footer() {
 
         <div className="mt-10 pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm">
-            &copy; {new Date().getFullYear()} PayZar. All rights reserved.
+            &copy; {new Date().getFullYear()} Annathan Pay. All rights reserved.
           </p>
           <p className="text-xs text-gray-500">
-            PayZar is not affiliated with PayPal, Inc.
+            Annathan Pay is not affiliated with PayPal, Inc.
           </p>
         </div>
       </div>

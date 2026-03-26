@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "PayZar – Withdraw PayPal to ZAR in South Africa",
+  title: "Annathan Pay – Withdraw PayPal to ZAR in South Africa",
   description:
     "Convert your PayPal funds to South African Rand and receive money straight to your local bank account. Fast, safe, and transparent.",
 };

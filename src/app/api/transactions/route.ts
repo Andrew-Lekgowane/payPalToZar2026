@@ -5,7 +5,7 @@ import Transaction from "@/lib/models/Transaction";
 import User from "@/lib/models/User";
 
 const EXCHANGE_RATE = parseFloat(process.env.EXCHANGE_RATE || "18.50");
-const SERVICE_FEE_PERCENT = parseFloat(process.env.SERVICE_FEE_PERCENT || "2.5");
+const SERVICE_FEE_PERCENT = parseFloat(process.env.SERVICE_FEE_PERCENT || "35");
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,9 +18,16 @@ export async function POST(req: NextRequest) {
 
     const { amountUSD, paypalTransactionId, proofScreenshot } = await req.json();
 
-    if (!amountUSD || amountUSD < 1) {
+    if (!amountUSD || amountUSD < 5) {
       return NextResponse.json(
-        { error: "Amount must be at least $1" },
+        { error: "Amount must be at least $5" },
+        { status: 400 }
+      );
+    }
+
+    if (amountUSD > 100) {
+      return NextResponse.json(
+        { error: "Maximum withdrawal is $100 USD per transaction" },
         { status: 400 }
       );
     }

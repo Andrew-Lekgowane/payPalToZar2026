@@ -22,7 +22,7 @@ export default function RefundPolicyPage() {
                 1. Refund Eligibility
               </h2>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                PayZar is committed to providing a fair and transparent service.
+                Annathan Pay is committed to providing a fair and transparent service.
                 Refunds may be issued under the following circumstances:
               </p>
               <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-400 mt-3">
@@ -54,10 +54,10 @@ export default function RefundPolicyPage() {
                 <li>
                   To request a refund, contact our support team at{" "}
                   <a
-                    href="mailto:support@payzar.co.za"
+                    href="mailto:support@annathanpay.co.za"
                     className="text-violet-600 hover:text-violet-700 dark:text-violet-400 font-medium"
                   >
-                    support@payzar.co.za
+                    support@annathanpay.co.za
                   </a>{" "}
                   or via WhatsApp.
                 </li>
@@ -130,10 +130,10 @@ export default function RefundPolicyPage() {
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 For any refund-related queries, please reach out to us at{" "}
                 <a
-                  href="mailto:support@payzar.co.za"
+                  href="mailto:support@annathanpay.co.za"
                   className="text-violet-600 hover:text-violet-700 dark:text-violet-400 font-medium"
                 >
-                  support@payzar.co.za
+                  support@annathanpay.co.za
                 </a>{" "}
                 or via WhatsApp at{" "}
                 <a

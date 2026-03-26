@@ -56,7 +56,7 @@ export default function WhyUseUs() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <Heading as="h2" className="mb-4">
-            Why Use PayZar?
+            Why Use Annathan Pay?
           </Heading>
           <SubHeading className="max-w-2xl mx-auto">
             We make it simple, fast, and safe to get your PayPal money in ZAR

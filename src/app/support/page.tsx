@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: "What is the minimum amount I can convert?",
-    a: "The minimum conversion is $1 USD. There is no maximum limit, but larger amounts may require additional verification.",
+    a: "The minimum conversion is $5 USD. The maximum withdrawal is $100 USD per transaction.",
   },
   {
     q: "Which banks do you support?",
@@ -35,7 +35,7 @@ const faqs = [
   },
   {
     q: "What fees do you charge?",
-    a: "We charge a 2.5% service fee on the USD amount. The exchange rate shown already includes this, so you always know exactly what you'll receive.",
+    a: "We charge a 35% service fee on the USD amount. The exchange rate shown already includes this, so you always know exactly what you'll receive.",
   },
   {
     q: "What if my payment fails or gets reversed?",
@@ -115,10 +115,10 @@ export default function SupportPage() {
                 </h3>
                 <p className="text-sm text-gray-500 mb-3">Send us a message</p>
                 <a
-                  href="mailto:support@payzar.co.za"
+                  href="mailto:support@annathanpay.co.za"
                   className="text-sm font-semibold text-violet-600 hover:text-violet-700 dark:text-violet-400"
                 >
-                  support@payzar.co.za
+                  support@annathanpay.co.za
                 </a>
               </div>
             </Card>
