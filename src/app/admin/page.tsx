@@ -23,6 +23,9 @@ import {
   Banknote,
   Filter,
   X,
+  Plus,
+  Pencil,
+  UserPlus,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/layout/Navbar";
@@ -155,6 +158,24 @@ export default function AdminPage() {
   >(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
+  // Edit user
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "", email: "", phone: "", role: "user",
+    bankName: "", accountNumber: "", accountHolder: "", branchCode: "",
+    password: "",
+  });
+  const [userSaving, setUserSaving] = useState(false);
+
+  // Create user
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const blankCreate = {
+    name: "", email: "", phone: "", password: "", role: "user",
+    bankName: "", accountNumber: "", accountHolder: "", branchCode: "",
+  };
+  const [createForm, setCreateForm] = useState(blankCreate);
+  const [userCreating, setUserCreating] = useState(false);
+
   const fetchData = useCallback(async () => {
     try {
       const [txRes, usersRes] = await Promise.all([
@@ -243,9 +264,7 @@ export default function AdminPage() {
   const handleDeleteUser = async (userId: string) => {
     setUserDeleting(true);
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       toast.success("User deleted");
@@ -255,6 +274,64 @@ export default function AdminPage() {
       toast.error(err instanceof Error ? err.message : "Delete failed");
     } finally {
       setUserDeleting(false);
+    }
+  };
+
+  const openEditMode = (user: AdminUser) => {
+    setEditForm({
+      name: user.name,
+      email: user.email,
+      phone: user.phone || "",
+      role: user.role,
+      bankName: user.bankName || "",
+      accountNumber: user.accountNumber || "",
+      accountHolder: user.accountHolder || "",
+      branchCode: user.branchCode || "",
+      password: "",
+    });
+    setEditMode(true);
+  };
+
+  const handleEditUser = async (userId: string) => {
+    setUserSaving(true);
+    try {
+      const payload = { ...editForm };
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      toast.success("User updated successfully");
+      setEditMode(false);
+      setSelectedUser(null);
+      fetchData();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
+    } finally {
+      setUserSaving(false);
+    }
+  };
+
+  const handleCreateUser = async () => {
+    setUserCreating(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(createForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      toast.success(`User "${createForm.name}" created successfully`);
+      setShowCreateUser(false);
+      setCreateForm(blankCreate);
+      fetchData();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Could not create user");
+    } finally {
+      setUserCreating(false);
     }
   };
 
@@ -514,6 +591,15 @@ export default function AdminPage() {
           {/* Users Tab */}
           {tab === "users" && (
             <Card>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {users.length} registered user{users.length !== 1 ? "s" : ""}
+                </p>
+                <Button size="sm" onClick={() => { setCreateForm(blankCreate); setShowCreateUser(true); }}>
+                  <UserPlus className="w-4 h-4 mr-1.5" />
+                  Add User
+                </Button>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -908,160 +994,208 @@ export default function AdminPage() {
       {/* ─── User Management Modal ─── */}
       <Modal
         isOpen={!!selectedUser}
-        onClose={() => {
-          setSelectedUser(null);
-          setPendingUserAction(null);
-        }}
-        title="Manage User"
+        onClose={() => { setSelectedUser(null); setPendingUserAction(null); setEditMode(false); }}
+        title={editMode ? `Editing: ${selectedUser?.name}` : "Manage User"}
         size="lg"
       >
         {selectedUser && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <p className="text-xs text-gray-500 mb-0.5">Full Name</p>
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {selectedUser.name}
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <p className="text-xs text-gray-500 mb-0.5">Phone</p>
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {selectedUser.phone || "—"}
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 col-span-2">
-                <p className="text-xs text-gray-500 mb-0.5">Email</p>
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {selectedUser.email}
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <p className="text-xs text-gray-500 mb-0.5">Bank</p>
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {selectedUser.bankName || "—"}
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <p className="text-xs text-gray-500 mb-0.5">Account Number</p>
-                <div className="flex items-center">
-                  <p className="font-semibold text-gray-900 dark:text-white font-mono">
-                    {selectedUser.accountNumber || "—"}
-                  </p>
-                  {selectedUser.accountNumber && (
-                    <CopyButton
-                      value={selectedUser.accountNumber}
-                      label="Account number"
-                    />
+
+            {/* ── VIEW MODE ── */}
+            {!editMode && (
+              <>
+                {/* Top action row */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Badge variant={selectedUser.role === "admin" ? "info" : "default"}>
+                      {selectedUser.role}
+                    </Badge>
+                    <span className="text-xs text-gray-400">
+                      Joined {new Date(selectedUser.createdAt).toLocaleDateString("en-ZA")}
+                    </span>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => openEditMode(selectedUser)}>
+                    <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                    Edit User
+                  </Button>
+                </div>
+
+                {/* Info grid */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {[
+                    { label: "Full Name",       value: selectedUser.name },
+                    { label: "Phone",            value: selectedUser.phone || "—" },
+                    { label: "Email",            value: selectedUser.email, span: true },
+                    { label: "Bank",             value: selectedUser.bankName || "—" },
+                    { label: "Account Holder",   value: selectedUser.accountHolder || "—" },
+                    { label: "Account Number",   value: selectedUser.accountNumber || "—" },
+                    { label: "Branch Code",      value: selectedUser.branchCode || "—" },
+                  ].map(({ label, value, span }) => (
+                    <div key={label} className={`p-3 rounded-xl bg-gray-50 dark:bg-gray-800 ${span ? "col-span-2" : ""}`}>
+                      <p className="text-xs text-gray-500 mb-0.5">{label}</p>
+                      <p className="font-semibold text-gray-900 dark:text-white break-all">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Actions */}
+                <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-4">
+                  {pendingUserAction ? (
+                    <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 space-y-3">
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                        {pendingUserAction.type === "delete"
+                          ? `⚠️ Delete "${selectedUser.name}"? This cannot be undone.`
+                          : `Change role to "${(pendingUserAction as { type: "role"; value: string }).value}"?`}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={pendingUserAction.type === "delete" ? "danger" : "primary"}
+                          isLoading={userUpdating || userDeleting}
+                          disabled={userUpdating || userDeleting}
+                          onClick={() => {
+                            if (pendingUserAction.type === "delete") handleDeleteUser(selectedUser._id);
+                            else handleUpdateUserRole(selectedUser._id, (pendingUserAction as { type: "role"; value: string }).value);
+                            setPendingUserAction(null);
+                          }}
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                          Yes, confirm
+                        </Button>
+                        <Button variant="outline" onClick={() => setPendingUserAction(null)} disabled={userUpdating || userDeleting}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Change Role</p>
+                        <div className="flex gap-2">
+                          <Button onClick={() => setPendingUserAction({ type: "role", value: "admin" })} disabled={selectedUser.role === "admin"}>
+                            <ShieldCheck className="w-4 h-4 mr-1" />
+                            Make Admin
+                          </Button>
+                          <Button variant="outline" onClick={() => setPendingUserAction({ type: "role", value: "user" })} disabled={selectedUser.role === "user"}>
+                            <ShieldOff className="w-4 h-4 mr-1" />
+                            Make Regular User
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
+                        <p className="text-xs font-bold text-red-500 uppercase tracking-wide mb-2">Danger Zone</p>
+                        <Button variant="danger" onClick={() => setPendingUserAction({ type: "delete" })}>
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete User
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </div>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <p className="text-xs text-gray-500 mb-0.5">Role</p>
-                <Badge
-                  variant={selectedUser.role === "admin" ? "info" : "default"}
-                >
-                  {selectedUser.role}
-                </Badge>
-              </div>
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <p className="text-xs text-gray-500 mb-0.5">Joined</p>
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {new Date(selectedUser.createdAt).toLocaleDateString("en-ZA")}
-                </p>
-              </div>
-            </div>
+              </>
+            )}
 
-            <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-4">
-              {pendingUserAction ? (
-                <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 space-y-3">
-                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-                    {pendingUserAction.type === "delete"
-                      ? `Delete ${selectedUser.name}? This cannot be undone.`
-                      : `Change ${selectedUser.name}&apos;s role to &quot;${(pendingUserAction as { type: "role"; value: string }).value}&quot;?`}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      variant={
-                        pendingUserAction.type === "delete"
-                          ? "danger"
-                          : "primary"
-                      }
-                      onClick={() => {
-                        if (pendingUserAction.type === "delete")
-                          handleDeleteUser(selectedUser._id);
-                        else
-                          handleUpdateUserRole(
-                            selectedUser._id,
-                            (
-                              pendingUserAction as {
-                                type: "role";
-                                value: string;
-                              }
-                            ).value,
-                          );
-                        setPendingUserAction(null);
-                      }}
-                      isLoading={userUpdating || userDeleting}
-                      disabled={userUpdating || userDeleting}
-                    >
-                      <CheckCircle2 className="w-4 h-4 mr-1.5" />
-                      Yes, confirm
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setPendingUserAction(null)}
-                      disabled={userUpdating || userDeleting}
-                    >
-                      Cancel
-                    </Button>
+            {/* ── EDIT MODE ── */}
+            {editMode && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Input label="Full Name *" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+                  <Input label="Phone *" value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
+                  <Input label="Email *" type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} className="col-span-full sm:col-span-2" />
+                </div>
+
+                <div className="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Bank Details</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Input label="Bank Name" value={editForm.bankName} onChange={(e) => setEditForm({ ...editForm, bankName: e.target.value })} />
+                    <Input label="Account Holder" value={editForm.accountHolder} onChange={(e) => setEditForm({ ...editForm, accountHolder: e.target.value })} />
+                    <Input label="Account Number" value={editForm.accountNumber} onChange={(e) => setEditForm({ ...editForm, accountNumber: e.target.value })} />
+                    <Input label="Branch Code" value={editForm.branchCode} onChange={(e) => setEditForm({ ...editForm, branchCode: e.target.value })} />
                   </div>
                 </div>
-              ) : (
-                <>
-                  <div className="space-y-3">
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Change Role
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() =>
-                          setPendingUserAction({ type: "role", value: "admin" })
-                        }
-                        disabled={selectedUser.role === "admin"}
+
+                <div className="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Role & Password</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
+                      <select
+                        value={editForm.role}
+                        onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                        className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20"
                       >
-                        <ShieldCheck className="w-4 h-4 mr-1" />
-                        Make Admin
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() =>
-                          setPendingUserAction({ type: "role", value: "user" })
-                        }
-                        disabled={selectedUser.role === "user"}
-                      >
-                        <ShieldOff className="w-4 h-4 mr-1" />
-                        Make Regular User
-                      </Button>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                      </select>
                     </div>
+                    <Input label="New Password (leave blank to keep current)" type="password" placeholder="Min 6 characters" value={editForm.password} onChange={(e) => setEditForm({ ...editForm, password: e.target.value })} />
                   </div>
-                  <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
-                    <p className="text-sm font-semibold text-red-600 mb-2">
-                      Danger Zone
-                    </p>
-                    <Button
-                      variant="danger"
-                      onClick={() => setPendingUserAction({ type: "delete" })}
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete User
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
+                </div>
+
+                <div className="flex gap-3 border-t border-gray-100 dark:border-gray-800 pt-4">
+                  <Button fullWidth onClick={() => handleEditUser(selectedUser._id)} isLoading={userSaving} disabled={userSaving}>
+                    <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                    Save Changes
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditMode(false)} disabled={userSaving}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
+      </Modal>
+
+      {/* ─── Create User Modal ─── */}
+      <Modal
+        isOpen={showCreateUser}
+        onClose={() => { setShowCreateUser(false); setCreateForm(blankCreate); }}
+        title="Create New User"
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="p-3 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800">
+            <p className="text-xs text-violet-700 dark:text-violet-300">
+              Fill in the details below. The user will be able to log in immediately with the password you set.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input label="Full Name *" placeholder="e.g. Jane Doe" value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} />
+            <Input label="Phone Number *" placeholder="e.g. 0821234567" value={createForm.phone} onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })} />
+            <Input label="Email Address *" type="email" placeholder="jane@example.com" value={createForm.email} onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })} />
+            <Input label="Password *" type="password" placeholder="Min 6 characters" value={createForm.password} onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })} />
+          </div>
+
+          <div className="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Bank Details (optional)</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input label="Bank Name" placeholder="e.g. FNB" value={createForm.bankName} onChange={(e) => setCreateForm({ ...createForm, bankName: e.target.value })} />
+              <Input label="Account Holder" placeholder="Full name on account" value={createForm.accountHolder} onChange={(e) => setCreateForm({ ...createForm, accountHolder: e.target.value })} />
+              <Input label="Account Number" value={createForm.accountNumber} onChange={(e) => setCreateForm({ ...createForm, accountNumber: e.target.value })} />
+              <Input label="Branch Code" value={createForm.branchCode} onChange={(e) => setCreateForm({ ...createForm, branchCode: e.target.value })} />
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
+              <select
+                value={createForm.role}
+                onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+
+          <Button fullWidth onClick={handleCreateUser} isLoading={userCreating} disabled={userCreating || !createForm.name || !createForm.email || !createForm.password || !createForm.phone}>
+            <Plus className="w-4 h-4 mr-1.5" />
+            Create User
+          </Button>
+        </div>
       </Modal>
 
       {/* ─── Screenshot Lightbox ─── */}
