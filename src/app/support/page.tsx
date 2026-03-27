@@ -16,6 +16,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
 import Card from "@/components/ui/Card";
 import Heading from "@/components/ui/Heading";
 import SubHeading from "@/components/ui/SubHeading";
@@ -208,20 +209,15 @@ export default function SupportPage() {
                     }
                     required
                   />
-                  <div className="w-full">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      Message
-                    </label>
-                    <textarea
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 transition-all duration-200 min-h-30 resize-y"
-                      placeholder="How can we help you?"
-                      value={form.message}
-                      onChange={(e) =>
-                        setForm({ ...form, message: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
+                  <Textarea
+                    label="Message"
+                    placeholder="How can we help you?"
+                    value={form.message}
+                    onChange={(e) =>
+                      setForm({ ...form, message: e.target.value })
+                    }
+                    required
+                  />
                   <Button type="submit" fullWidth isLoading={sending}>
                     <Send className="w-4 h-4 mr-2" />
                     Send Message
