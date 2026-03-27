@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="55%" stop-color="#302b63"/>
+      <stop offset="100%" stop-color="#1a0533"/>
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="topBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+
+  <!-- Soft glow orbs -->
+  <circle cx="160" cy="180" r="280" fill="#7c3aed" fill-opacity="0.14"/>
+  <circle cx="960" cy="920" r="340" fill="#4f46e5" fill-opacity="0.10"/>
+  <circle cx="980" cy="160" r="200" fill="#a855f7" fill-opacity="0.07"/>
+  <circle cx="100" cy="960" r="180" fill="#6366f1" fill-opacity="0.07"/>
+
+  <!-- Top gradient stripe -->
+  <rect x="0" y="0" width="1080" height="7" fill="url(#topBar)"/>
+
+  <!-- LOGO ICON -->
+  <rect x="466" y="68" width="148" height="148" rx="34" fill="url(#iconGrad)" filter="url(#glow)"/>
+  <!-- Zap / Lightning bolt (Lucide Zap scaled ~5.8x, centered in 148x148 box at 466,68) -->
+  <g transform="translate(489,82) scale(4.9)">
+    <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" fill="white"/>
+  </g>
+
+  <!-- Brand name -->
+  <text x="540" y="268"
+    font-family="'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+    font-size="46" font-weight="700" fill="white" text-anchor="middle" letter-spacing="4">
+    ANNATHAN PAY
+  </text>
+  <text x="540" y="308"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="24" fill="#a5b4fc" text-anchor="middle" letter-spacing="1">
+    South Africa's PayPal Withdrawal Service
+  </text>
+
+  <!-- Thin separator -->
+  <line x1="380" y1="334" x2="700" y2="334" stroke="#7c3aed" stroke-width="1.5" stroke-opacity="0.5"/>
+
+  <!-- MAIN HEADLINE -->
+  <text x="540" y="420"
+    font-family="'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+    font-size="90" font-weight="900" fill="white" text-anchor="middle" letter-spacing="-2">
+    Got PayPal?
+  </text>
+  <text x="540" y="514"
+    font-family="'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+    font-size="68" font-weight="900" fill="#a855f7" text-anchor="middle" letter-spacing="-1">
+    We Pay You in Rands.
+  </text>
+
+  <text x="540" y="572"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="30" fill="#c4b5fd" text-anchor="middle">
+    Fast · Simple · Directly to your bank account
+  </text>
+
+  <!-- CONVERSION EXAMPLE CARD -->
+  <rect x="100" y="604" width="880" height="148" rx="26"
+    fill="white" fill-opacity="0.05"
+    stroke="#7c3aed" stroke-width="1.5" stroke-opacity="0.55"/>
+
+  <!-- Left: You Send -->
+  <text x="280" y="658"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="24" fill="#c4b5fd" text-anchor="middle">You send on PayPal</text>
+  <text x="280" y="724"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="58" font-weight="900" fill="white" text-anchor="middle">$50</text>
+
+  <!-- Arrow -->
+  <text x="540" y="718"
+    font-family="Arial, sans-serif"
+    font-size="54" fill="#7c3aed" text-anchor="middle">&#8594;</text>
+
+  <!-- Right: You Receive -->
+  <text x="800" y="658"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="24" fill="#c4b5fd" text-anchor="middle">You receive in bank</text>
+  <text x="800" y="724"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="58" font-weight="900" fill="#34d399" text-anchor="middle">R601.25</text>
+
+  <!-- THREE FEATURE CARDS -->
+  <rect x="88" y="782" width="268" height="116" rx="20"
+    fill="white" fill-opacity="0.04" stroke="#7c3aed" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="222" y="830"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="34" text-anchor="middle">&#9889;</text>
+  <text x="222" y="864"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="24" font-weight="700" fill="white" text-anchor="middle">Fast Payout</text>
+  <text x="222" y="888"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="18" fill="#c4b5fd" text-anchor="middle">Same-day processing</text>
+
+  <rect x="406" y="782" width="268" height="116" rx="20"
+    fill="white" fill-opacity="0.04" stroke="#7c3aed" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="540" y="830"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="34" text-anchor="middle">&#128274;</text>
+  <text x="540" y="864"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="24" font-weight="700" fill="white" text-anchor="middle">100% Secure</text>
+  <text x="540" y="888"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="18" fill="#c4b5fd" text-anchor="middle">Verified transactions</text>
+
+  <rect x="724" y="782" width="268" height="116" rx="20"
+    fill="white" fill-opacity="0.04" stroke="#7c3aed" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="858" y="830"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="34" text-anchor="middle">&#127482;&#127462;</text>
+  <text x="858" y="864"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="24" font-weight="700" fill="white" text-anchor="middle">All SA Banks</text>
+  <text x="858" y="888"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="18" fill="#c4b5fd" text-anchor="middle">FNB, Nedbank &amp; more</text>
+
+  <!-- CTA BUTTON -->
+  <rect x="280" y="932" width="520" height="90" rx="45" fill="url(#btnGrad)"/>
+  <text x="540" y="987"
+    font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+    font-size="34" font-weight="800" fill="white" text-anchor="middle">
+    Start from just $5 USD &#8594;
+  </text>
+
+  <!-- Min/Max note -->
+  <text x="540" y="1046"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="22" fill="#8b5cf6" text-anchor="middle">
+    Minimum $5 USD  ·  Maximum $100 USD per transaction
+  </text>
+
+  <!-- Contact footer -->
+  <text x="540" y="1066"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="0" fill="white" text-anchor="middle"/>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="1073" width="1080" height="7" fill="url(#topBar)" opacity="0.6"/>
+</svg>

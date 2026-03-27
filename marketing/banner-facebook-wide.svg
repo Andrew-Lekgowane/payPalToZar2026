@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" width="1200" height="628">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="60%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="topBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="cardBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.08"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="628" fill="url(#bg)"/>
+
+  <!-- Orbs -->
+  <circle cx="100" cy="100" r="200" fill="#7c3aed" fill-opacity="0.13"/>
+  <circle cx="600" cy="628" r="280" fill="#4f46e5" fill-opacity="0.08"/>
+  <circle cx="1100" cy="80" r="180" fill="#a855f7" fill-opacity="0.07"/>
+
+  <!-- Top bar -->
+  <rect x="0" y="0" width="1200" height="6" fill="url(#topBar)"/>
+
+  <!-- ===== LEFT SIDE: Text ===== -->
+  <!-- Logo icon (small) -->
+  <rect x="60" y="52" width="72" height="72" rx="18" fill="url(#iconGrad)" filter="url(#glow)"/>
+  <g transform="translate(71,62) scale(2.45)">
+    <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" fill="white"/>
+  </g>
+  <!-- Brand text next to logo -->
+  <text x="148" y="82"
+    font-family="'Segoe UI','SF Pro Display','Helvetica Neue',Arial,sans-serif"
+    font-size="28" font-weight="700" fill="white" letter-spacing="2">ANNATHAN PAY</text>
+  <text x="148" y="108"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="17" fill="#a5b4fc">PayPal to ZAR Withdrawal Service</text>
+
+  <!-- Main headline -->
+  <text x="60" y="202"
+    font-family="'Segoe UI','SF Pro Display','Helvetica Neue',Arial,sans-serif"
+    font-size="62" font-weight="900" fill="white" letter-spacing="-1">Have PayPal money?</text>
+  <text x="60" y="272"
+    font-family="'Segoe UI','SF Pro Display','Helvetica Neue',Arial,sans-serif"
+    font-size="62" font-weight="900" fill="#a855f7" letter-spacing="-1">We'll pay you in Rands.</text>
+
+  <text x="60" y="320"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="26" fill="#c4b5fd">
+    Fast, simple &amp; secure PayPal withdrawals for South Africans.
+  </text>
+
+  <!-- Feature list -->
+  <text x="60" y="374" font-family="'Segoe UI',Arial,sans-serif" font-size="23" fill="#34d399">&#10003;  No complicated forms — done in 3 easy steps</text>
+  <text x="60" y="410" font-family="'Segoe UI',Arial,sans-serif" font-size="23" fill="#34d399">&#10003;  Rands paid directly into your SA bank account</text>
+  <text x="60" y="446" font-family="'Segoe UI',Arial,sans-serif" font-size="23" fill="#34d399">&#10003;  Start with as little as $5 USD (max $100/transaction)</text>
+
+  <!-- CTA Button -->
+  <rect x="60" y="490" width="380" height="72" rx="36" fill="url(#btnGrad)"/>
+  <text x="250" y="534"
+    font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif"
+    font-size="27" font-weight="800" fill="white" text-anchor="middle">
+    Get Started Today &#8594;
+  </text>
+
+  <!-- Contact -->
+  <text x="60" y="593"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="20" fill="#8b5cf6">
+    payments@annathanpay.co.za
+  </text>
+
+  <!-- ===== DIVIDER ===== -->
+  <line x1="620" y1="40" x2="620" y2="588" stroke="#7c3aed" stroke-width="1" stroke-opacity="0.3"/>
+
+  <!-- ===== RIGHT SIDE: Calculator Visual ===== -->
+  <!-- Big conversion card -->
+  <rect x="660" y="60" width="480" height="510" rx="36"
+    fill="url(#cardBg)" stroke="#7c3aed" stroke-width="1.5" stroke-opacity="0.5"/>
+
+  <text x="900" y="118"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="22" fill="#a5b4fc" text-anchor="middle" letter-spacing="2">CONVERSION EXAMPLE</text>
+
+  <!-- Line separator -->
+  <line x1="700" y1="136" x2="1100" y2="136" stroke="#7c3aed" stroke-width="1" stroke-opacity="0.3"/>
+
+  <!-- You Send -->
+  <text x="900" y="188"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="22" fill="#c4b5fd" text-anchor="middle">You send on PayPal</text>
+  <text x="900" y="248"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="80" font-weight="900" fill="white" text-anchor="middle">$100</text>
+
+  <!-- Breakdown -->
+  <rect x="700" y="270" width="400" height="130" rx="16" fill="white" fill-opacity="0.04"/>
+  <text x="900" y="304"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="20" fill="#c4b5fd" text-anchor="middle">Service fee (35%)</text>
+  <text x="900" y="330"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="26" font-weight="700" fill="#f87171" text-anchor="middle">- $35.00</text>
+  <line x1="740" y1="346" x2="1060" y2="346" stroke="#7c3aed" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="900" y="370"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="20" fill="#c4b5fd" text-anchor="middle">After fee  ($65.00 × R18.50)</text>
+  <text x="900" y="394"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="0" fill="white" text-anchor="middle"/>
+
+  <!-- Arrow down -->
+  <text x="900" y="438"
+    font-family="Arial,sans-serif"
+    font-size="44" fill="#7c3aed" text-anchor="middle">&#8595;</text>
+
+  <!-- You Receive -->
+  <text x="900" y="490"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="22" fill="#c4b5fd" text-anchor="middle">You receive in your bank</text>
+  <text x="900" y="548"
+    font-family="'Segoe UI',Arial,sans-serif"
+    font-size="74" font-weight="900" fill="#34d399" text-anchor="middle">R1,202.50</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="622" width="1200" height="6" fill="url(#topBar)" opacity="0.6"/>
+</svg>
