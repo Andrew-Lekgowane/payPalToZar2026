@@ -9,6 +9,8 @@ import {
   CheckCircle,
   Clock,
   RefreshCw,
+  ChevronRight,
+  Zap,
   Eye,
   Trash2,
   ShieldCheck,
@@ -31,6 +33,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/layout/Navbar";
+import AdminBottomNav from "@/components/mobile/AdminBottomNav";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -397,6 +400,8 @@ export default function AdminPage() {
 
   return (
     <>
+      {/* ─── DESKTOP LAYOUT ─── */}
+      <div className="hidden md:block">
       <Navbar />
       <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -886,6 +891,233 @@ export default function AdminPage() {
           )}
         </div>
       </main>
+      </div>{/* end desktop */}
+
+      {/* ─── MOBILE LAYOUT ─── */}
+      <div className="md:hidden min-h-screen bg-gray-50 dark:bg-gray-950">
+
+        {/* Fixed top bar */}
+        <header className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/30">
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <span className="font-bold text-gray-900 dark:text-white text-sm">Admin Panel</span>
+            </div>
+          </div>
+          <button
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+          </button>
+        </header>
+
+        {/* Scrollable content */}
+        <div className="pt-16 pb-24 px-4 space-y-3">
+
+          {/* Stats 2x2 */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
+                <Users className="w-4 h-4 text-violet-500" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Users</p>
+                <p className="text-lg font-black text-gray-900 dark:text-white">{users.length}</p>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                <Clock className="w-4 h-4 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Needs Action</p>
+                <p className="text-lg font-black text-amber-600">{pendingCount}</p>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Completed</p>
+                <p className="text-lg font-black text-gray-900 dark:text-white">{completedCount}</p>
+              </div>
+            </div>
+            <div className="bg-linear-to-br from-violet-600 to-indigo-700 rounded-2xl p-3 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-xs text-white/70">Earnings</p>
+                <p className="text-lg font-black text-white">${totalFeesEarned.toFixed(0)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Period earnings */}
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between mb-2.5">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Period Earnings</p>
+              <div className="flex gap-1 overflow-x-auto">
+                {(["week","month","6months","year","all"] as const).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setEarningsFilter(p)}
+                    className={`px-2 py-0.5 rounded-full text-xs font-semibold shrink-0 transition-colors ${
+                      earningsFilter === p
+                        ? "bg-violet-600 text-white"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-500"
+                    }`}
+                  >
+                    {p === "week" ? "Wk" : p === "month" ? "Mo" : p === "6months" ? "6M" : p === "year" ? "Yr" : "All"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-black text-gray-900 dark:text-white">${periodFees.toFixed(2)}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{periodTx.length} transactions · R{periodZAR.toFixed(0)} paid out</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tab selector */}
+          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-2xl p-1 gap-1">
+            {(["transactions","users"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold capitalize transition-colors ${
+                  tab === t
+                    ? "bg-white dark:bg-gray-700 text-violet-600 dark:text-violet-400 shadow-sm"
+                    : "text-gray-500"
+                }`}
+              >
+                {t}
+                {t === "transactions" && pendingCount > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+                    {pendingCount}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Status filter (transactions tab) */}
+          {tab === "transactions" && (
+            <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+              {ALL_STATUSES.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(s)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold shrink-0 capitalize transition-colors ${
+                    statusFilter === s
+                      ? "bg-violet-600 text-white"
+                      : "bg-white dark:bg-gray-900 text-gray-500 border border-gray-200 dark:border-gray-700"
+                  }`}
+                >
+                  {s}{s !== "all" && ` (${transactions.filter(t => t.status === s).length})`}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Add User button (users tab) */}
+          {tab === "users" && (
+            <button
+              onClick={() => { setCreateForm(blankCreate); setShowCreateUser(true); }}
+              className="w-full py-3 rounded-2xl bg-linear-to-r from-violet-600 to-indigo-600 text-white font-bold text-sm flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              Add New User
+            </button>
+          )}
+
+          {/* Transactions list */}
+          {tab === "transactions" && (
+            <div className="space-y-2">
+              {filteredTx.length === 0 ? (
+                <div className="py-10 text-center text-gray-400 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
+                  <p className="text-sm">No transactions found</p>
+                </div>
+              ) : filteredTx.map((tx) => {
+                const cfg = statusConfig[tx.status] || statusConfig.pending;
+                const leftColor: Record<string, string> = {
+                  pending: "bg-amber-400", verifying: "bg-blue-400",
+                  processing: "bg-violet-400", completed: "bg-emerald-400",
+                  failed: "bg-red-400", refunded: "bg-gray-400",
+                };
+                return (
+                  <button
+                    key={tx._id}
+                    onClick={() => { setSelectedTx(tx); setAdminNote(tx.adminNote || ""); setShowScreenshot(false); }}
+                    className="w-full bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-3.5 flex items-center gap-3 text-left shadow-sm active:scale-[0.98] transition-transform"
+                  >
+                    <div className={`w-1 self-stretch rounded-full ${leftColor[tx.status] || "bg-gray-300"} shrink-0`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold text-gray-900 dark:text-white truncate max-w-[130px]">
+                          {tx.userId?.name || "Unknown"}
+                        </span>
+                        <Badge variant={cfg.variant}>{cfg.label}</Badge>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">${tx.amountUSD.toFixed(2)}</span>
+                        <span className="text-gray-300 text-xs">→</span>
+                        <span className="text-sm font-black text-emerald-600">R{tx.amountZAR.toFixed(2)}</span>
+                        {tx.proofScreenshot && <span className="ml-auto text-xs text-emerald-500 font-semibold">✓ Proof</span>}
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Users list */}
+          {tab === "users" && (
+            <div className="space-y-2">
+              {users.length === 0 ? (
+                <div className="py-10 text-center text-gray-400 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
+                  <p className="text-sm">No users found</p>
+                </div>
+              ) : users.map((u) => (
+                <button
+                  key={u._id}
+                  onClick={() => setSelectedUser(u)}
+                  className="w-full bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-3.5 flex items-center gap-3 text-left shadow-sm active:scale-[0.98] transition-transform"
+                >
+                  <div className="w-9 h-9 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0 font-bold text-violet-600 text-sm">
+                    {u.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">{u.name}</span>
+                      <Badge variant={u.role === "admin" ? "info" : "default"}>{u.role}</Badge>
+                    </div>
+                    <p className="text-xs text-gray-400 truncate">{u.email}</p>
+                    {u.bankName && <p className="text-xs text-gray-400">{u.bankName}</p>}
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
+
+        </div>
+
+        <AdminBottomNav
+          active={tab === "transactions" ? "transactions" : tab === "users" ? "users" : "overview"}
+          onTabChange={(t) => setTab(t)}
+          onOverview={() => { setTab("transactions"); setStatusFilter("all"); }}
+        />
+      </div>{/* end mobile */}
 
       {/* ─── Transaction Management Modal ─── */}
       <Modal

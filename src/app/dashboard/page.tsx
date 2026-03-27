@@ -18,11 +18,14 @@ import {
   CheckCircle,
   ArrowRight,
   ChevronLeft,
+  ChevronRight,
   ImageIcon,
+  Zap,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import BottomNav from "@/components/mobile/BottomNav";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -360,6 +363,8 @@ export default function DashboardPage() {
 
   return (
     <>
+      {/* ─── DESKTOP LAYOUT ─── */}
+      <div className="hidden md:block">
       <Navbar />
       <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -693,6 +698,169 @@ export default function DashboardPage() {
         </div>
       </main>
       <Footer />
+      </div>{/* end desktop */}
+
+      {/* ─── MOBILE LAYOUT ─── */}
+      <div className="md:hidden min-h-screen bg-gray-50 dark:bg-gray-950">
+        {/* Fixed top bar */}
+        <header className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/30">
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-gray-900 dark:text-white text-base">Annathan Pay</span>
+          </div>
+          <button
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+          </button>
+        </header>
+
+        {/* Scrollable content */}
+        <div className="pt-16 pb-24 px-4 space-y-3">
+
+          {/* Hero balance card */}
+          <div className="rounded-3xl bg-linear-to-br from-violet-600 via-violet-700 to-indigo-800 p-5 text-white shadow-xl shadow-violet-500/25">
+            <p className="text-xs font-medium opacity-70 mb-0.5">
+              Hi {session?.user?.name?.split(" ")[0]} 👋
+            </p>
+            <p className="text-xs opacity-50 mb-1">Total Received</p>
+            <p className="text-3xl font-black tracking-tight">
+              R{totalConverted.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+            </p>
+            <div className="flex gap-2 mt-3">
+              <div className="bg-white/15 backdrop-blur rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+                <Clock className="w-3 h-3 opacity-80" />
+                <span className="text-xs font-semibold">{pendingCount} pending</span>
+              </div>
+              <div className="bg-white/15 backdrop-blur rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+                <CheckCircle className="w-3 h-3 opacity-80" />
+                <span className="text-xs font-semibold">{completedCount} done</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bank alert */}
+          {profile && (!profile.bankName || !profile.accountNumber) && (
+            <button
+              onClick={() => setShowProfile(true)}
+              className="w-full p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 flex items-center gap-3 text-left"
+            >
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-800/40 flex items-center justify-center shrink-0">
+                <Building2 className="w-4 h-4 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-amber-700 dark:text-amber-300">Add bank details</p>
+                <p className="text-xs text-amber-500 dark:text-amber-400">Required to receive your Rands</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-amber-400 shrink-0" />
+            </button>
+          )}
+
+          {/* Quick Calculator */}
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-800 shadow-sm">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Quick Calculator</p>
+            <div className="relative mb-1.5">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-base">$</span>
+              <input
+                type="number"
+                min={MIN_AMOUNT_USD}
+                max={MAX_AMOUNT_USD}
+                step="0.01"
+                placeholder="Enter USD amount"
+                value={amountUSD}
+                onChange={(e) => setAmountUSD(e.target.value)}
+                className={`w-full pl-8 pr-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold focus:outline-none transition-colors text-base ${
+                  amountError
+                    ? "border-red-400 focus:border-red-500"
+                    : "border-gray-100 dark:border-gray-700 focus:border-violet-500"
+                }`}
+              />
+            </div>
+            {amountError ? (
+              <p className="text-xs text-red-500 font-semibold mb-2">⚠️ {amountError}</p>
+            ) : (
+              <p className="text-xs text-gray-400 mb-2">Min $5 · Max $100 per transaction</p>
+            )}
+            {previewUSD >= MIN_AMOUNT_USD && previewUSD <= MAX_AMOUNT_USD && (
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-xl p-3 flex items-center justify-between mb-3">
+                <span className="text-xs text-gray-500">You will receive</span>
+                <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">R{previewZAR}</span>
+              </div>
+            )}
+            <button
+              onClick={openConvertWithAmount}
+              disabled={!amountUSD || !!amountError}
+              className="w-full py-3 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 text-white font-bold text-sm shadow-md shadow-violet-500/20 disabled:opacity-40"
+            >
+              Convert Now →
+            </button>
+          </div>
+
+          {/* Transactions */}
+          <div>
+            <div className="flex items-center justify-between mb-2.5">
+              <p className="text-sm font-bold text-gray-900 dark:text-white">Recent Transactions</p>
+            </div>
+            {transactions.length === 0 ? (
+              <div className="py-10 flex flex-col items-center gap-2 text-gray-400 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
+                <ArrowRightLeft className="w-8 h-8 opacity-30" />
+                <p className="text-sm font-medium">No transactions yet</p>
+                <p className="text-xs opacity-70">Tap Convert to get started!</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {transactions.map((tx) => {
+                  const cfg = statusConfig[tx.status] || statusConfig.pending;
+                  const leftColor: Record<string, string> = {
+                    pending: "bg-amber-400",
+                    verifying: "bg-blue-400",
+                    processing: "bg-violet-400",
+                    completed: "bg-emerald-400",
+                    failed: "bg-red-400",
+                    refunded: "bg-gray-400",
+                  };
+                  return (
+                    <button
+                      key={tx._id}
+                      onClick={() => setSelectedTx(tx)}
+                      className="w-full bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-3.5 flex items-center gap-3 text-left shadow-sm active:scale-[0.98] transition-transform"
+                    >
+                      <div className={`w-1 self-stretch rounded-full ${leftColor[tx.status] || "bg-gray-300"} shrink-0`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-gray-400">
+                            {new Date(tx.createdAt).toLocaleDateString("en-ZA")}
+                          </span>
+                          <Badge variant={cfg.variant}>{cfg.label}</Badge>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                            ${tx.amountUSD.toFixed(2)}
+                          </span>
+                          <span className="text-gray-300 text-xs">→</span>
+                          <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                            R{tx.amountZAR.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <BottomNav
+          onConvert={openConvertWithAmount}
+          onProfile={() => setShowProfile(true)}
+        />
+      </div>{/* end mobile */}
 
       {/* ─── Transaction Detail Modal ─── */}
       <Modal
