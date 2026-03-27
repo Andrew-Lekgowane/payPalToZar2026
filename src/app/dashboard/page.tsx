@@ -364,7 +364,7 @@ export default function DashboardPage() {
       <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-8">
             <div>
               <Heading as="h3">
                 Welcome back, {session?.user?.name?.split(" ")[0]} 👋
@@ -396,44 +396,41 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
             <Card>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-emerald-500" />
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                  <DollarSign className="w-4 h-4 md:w-6 md:h-6 text-emerald-500" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Total Received (ZAR)</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    R
-                    {totalConverted.toLocaleString("en-ZA", {
-                      minimumFractionDigits: 2,
-                    })}
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500 truncate">Total (ZAR)</p>
+                  <p className="text-base md:text-2xl font-bold text-gray-900 dark:text-white truncate">
+                    R{totalConverted.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
               </div>
             </Card>
             <Card>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-amber-500" />
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                  <Clock className="w-4 h-4 md:w-6 md:h-6 text-amber-500" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">In Progress</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-xs text-gray-500">In Progress</p>
+                  <p className="text-base md:text-2xl font-bold text-gray-900 dark:text-white">
                     {pendingCount}
                   </p>
                 </div>
               </div>
             </Card>
             <Card>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-                  <CheckCircle2 className="w-6 h-6 text-violet-500" />
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-4 h-4 md:w-6 md:h-6 text-violet-500" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-xs text-gray-500">Completed</p>
+                  <p className="text-base md:text-2xl font-bold text-gray-900 dark:text-white">
                     {completedCount}
                   </p>
                 </div>
@@ -551,42 +548,42 @@ export default function DashboardPage() {
             ) : (
               <>
               {/* Mobile card list */}
-              <div className="md:hidden space-y-3">
+              <div className="md:hidden space-y-2">
                 {transactions.map((tx) => {
                   const cfg = statusConfig[tx.status] || statusConfig.pending;
                   return (
                     <div
                       key={tx._id}
-                      className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
+                      className="p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs text-gray-500">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-gray-400">
                           {new Date(tx.createdAt).toLocaleDateString("en-ZA")}
                         </span>
                         <Badge variant={cfg.variant}>{cfg.label}</Badge>
                       </div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-1.5">
                         <div>
-                          <p className="text-xs text-gray-500 mb-0.5">You Sent</p>
-                          <p className="text-lg font-bold text-gray-900 dark:text-white">
+                          <p className="text-xs text-gray-500 mb-0.5">Sent</p>
+                          <p className="text-sm font-bold text-gray-900 dark:text-white">
                             ${tx.amountUSD.toFixed(2)}
                           </p>
                         </div>
-                        <span className="text-2xl text-gray-300 dark:text-gray-600">→</span>
+                        <span className="text-base text-gray-300 dark:text-gray-600">→</span>
                         <div className="text-right">
-                          <p className="text-xs text-gray-500 mb-0.5">You Receive</p>
-                          <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                          <p className="text-xs text-gray-500 mb-0.5">Received</p>
+                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                             R{tx.amountZAR.toFixed(2)}
                           </p>
                         </div>
                       </div>
-                      <p className="text-xs text-red-400 mb-3">
-                        Service fee: -${tx.serviceFee.toFixed(2)}
+                      <p className="text-xs text-red-400 mb-2">
+                        Fee: -${tx.serviceFee.toFixed(2)}
                       </p>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setSelectedTx(tx)}
-                          className="flex-1 py-2 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+                          className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
                         >
                           View Details
                         </button>
@@ -600,7 +597,7 @@ export default function DashboardPage() {
                               setProofScreenshot("");
                               setProofScreenshotName("");
                             }}
-                            className="flex-1 py-2 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-colors"
+                            className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-colors"
                           >
                             Upload Proof
                           </button>

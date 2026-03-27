@@ -401,7 +401,7 @@ export default function AdminPage() {
       <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-4 md:mb-8">
             <div>
               <Heading as="h3">Admin Panel</Heading>
               <p className="text-gray-500 mt-1">
@@ -419,50 +419,47 @@ export default function AdminPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8">
             <Card>
-              <div className="flex items-center gap-3">
-                <Users className="w-8 h-8 text-violet-500 shrink-0" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <Users className="w-5 h-5 md:w-8 md:h-8 text-violet-500 shrink-0" />
                 <div>
                   <p className="text-xs text-gray-500">Total Users</p>
-                  <p className="text-xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-base md:text-xl font-bold text-gray-900 dark:text-white">
                     {users.length}
                   </p>
                 </div>
               </div>
             </Card>
             <Card>
-              <div className="flex items-center gap-3">
-                <Clock className="w-8 h-8 text-amber-500 shrink-0" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <Clock className="w-5 h-5 md:w-8 md:h-8 text-amber-500 shrink-0" />
                 <div>
                   <p className="text-xs text-gray-500">Needs Action</p>
-                  <p className="text-xl font-bold text-amber-600">
+                  <p className="text-base md:text-xl font-bold text-amber-600">
                     {pendingCount}
                   </p>
                 </div>
               </div>
             </Card>
             <Card>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-8 h-8 text-emerald-500 shrink-0" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <CheckCircle className="w-5 h-5 md:w-8 md:h-8 text-emerald-500 shrink-0" />
                 <div>
                   <p className="text-xs text-gray-500">Completed</p>
-                  <p className="text-xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-base md:text-xl font-bold text-gray-900 dark:text-white">
                     {completedCount}
                   </p>
                 </div>
               </div>
             </Card>
             <Card>
-              <div className="flex items-center gap-3">
-                <TrendingUp className="w-8 h-8 text-indigo-500 shrink-0" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <TrendingUp className="w-5 h-5 md:w-8 md:h-8 text-indigo-500 shrink-0" />
                 <div>
-                  <p className="text-xs text-gray-500">Total Paid Out</p>
-                  <p className="text-xl font-bold text-emerald-600">
-                    R
-                    {totalZARPaid.toLocaleString("en-ZA", {
-                      minimumFractionDigits: 2,
-                    })}
+                  <p className="text-xs text-gray-500">Paid Out</p>
+                  <p className="text-base md:text-xl font-bold text-emerald-600">
+                    R{totalZARPaid.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
               </div>
@@ -495,28 +492,28 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
               {/* Main earnings highlight */}
-              <div className="col-span-1 sm:col-span-2 p-4 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600 text-white">
-                <p className="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">You Earned</p>
-                <p className="text-3xl font-bold">${periodFees.toFixed(2)}</p>
-                <p className="text-xs opacity-70 mt-1">
+              <div className="col-span-1 sm:col-span-2 p-3 md:p-4 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600 text-white">
+                <p className="text-xs font-semibold uppercase tracking-wide opacity-80 mb-0.5">You Earned</p>
+                <p className="text-2xl md:text-3xl font-bold">${periodFees.toFixed(2)}</p>
+                <p className="text-xs opacity-70 mt-0.5">
                   from {periodTx.length} completed transaction{periodTx.length !== 1 ? "s" : ""}
                 </p>
               </div>
               {/* ZAR paid out in period */}
-              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
-                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wide mb-1">ZAR Paid Out</p>
-                <p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+              <div className="p-3 md:p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wide mb-0.5">ZAR Paid Out</p>
+                <p className="text-base md:text-xl font-bold text-emerald-700 dark:text-emerald-300">
                   R{periodZAR.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
                 </p>
-                <p className="text-xs text-emerald-500 mt-1">in this period</p>
+                <p className="text-xs text-emerald-500 mt-0.5">in this period</p>
               </div>
               {/* All-time totals */}
-              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-                <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">All-Time Earned</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">${totalFeesEarned.toFixed(2)}</p>
-                <p className="text-xs text-gray-400 mt-1">{completedCount} total completed</p>
+              <div className="p-3 md:p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-0.5">All-Time Earned</p>
+                <p className="text-base md:text-xl font-bold text-gray-900 dark:text-white">${totalFeesEarned.toFixed(2)}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{completedCount} total completed</p>
               </div>
             </div>
           </Card>
@@ -573,9 +570,9 @@ export default function AdminPage() {
               </div>
 
               {/* Mobile card list */}
-              <div className="md:hidden space-y-3">
+              <div className="md:hidden space-y-2">
                 {filteredTx.length === 0 ? (
-                  <p className="py-10 text-center text-gray-400 text-sm">
+                  <p className="py-8 text-center text-gray-400 text-sm">
                     No transactions found
                   </p>
                 ) : (
@@ -584,30 +581,30 @@ export default function AdminPage() {
                     return (
                       <div
                         key={tx._id}
-                        className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
+                        className="p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
                       >
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start justify-between mb-1.5">
                           <div>
-                            <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                            <p className="font-semibold text-gray-900 dark:text-white text-xs">
                               {tx.userId?.name || "Unknown"}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-400">
                               {tx.userId?.email}
                             </p>
                           </div>
                           <Badge variant={cfg.variant}>{cfg.label}</Badge>
                         </div>
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between mb-1.5">
                           <div>
                             <p className="text-xs text-gray-500">Sent</p>
-                            <p className="font-bold text-gray-900 dark:text-white">
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">
                               ${tx.amountUSD.toFixed(2)}
                             </p>
                           </div>
-                          <span className="text-xl text-gray-300 dark:text-gray-600">→</span>
+                          <span className="text-sm text-gray-300 dark:text-gray-600">→</span>
                           <div className="text-right">
                             <p className="text-xs text-gray-500">Pay Out</p>
-                            <p className="font-bold text-emerald-600">
+                            <p className="text-sm font-bold text-emerald-600">
                               R{tx.amountZAR.toFixed(2)}
                             </p>
                           </div>
@@ -616,11 +613,11 @@ export default function AdminPage() {
                             {tx.proofScreenshot ? (
                               <span className="text-xs text-emerald-600 font-semibold">✓ Yes</span>
                             ) : (
-                              <span className="text-xs text-gray-400">None</span>
+                              <span className="text-xs text-gray-400">—</span>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center justify-between mt-3">
+                        <div className="flex items-center justify-between mt-2">
                           <span className="text-xs text-gray-400">
                             {new Date(tx.createdAt).toLocaleDateString("en-ZA")}
                           </span>
@@ -630,7 +627,7 @@ export default function AdminPage() {
                               setAdminNote(tx.adminNote || "");
                               setShowScreenshot(false);
                             }}
-                            className="px-4 py-1.5 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+                            className="px-3 py-1 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
                           >
                             Manage
                           </button>
@@ -757,45 +754,45 @@ export default function AdminPage() {
                 </Button>
               </div>
               {/* Mobile card list */}
-              <div className="md:hidden space-y-3">
+              <div className="md:hidden space-y-2">
                 {users.length === 0 ? (
-                  <p className="py-10 text-center text-gray-400 text-sm">
+                  <p className="py-8 text-center text-gray-400 text-sm">
                     No users found
                   </p>
                 ) : (
                   users.map((u) => (
                     <div
                       key={u._id}
-                      className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
+                      className="p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
                     >
-                      <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-start justify-between mb-1.5">
                         <div>
-                          <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                          <p className="font-semibold text-gray-900 dark:text-white text-xs">
                             {u.name}
                           </p>
-                          <p className="text-xs text-gray-500">{u.email}</p>
+                          <p className="text-xs text-gray-400">{u.email}</p>
                         </div>
                         <Badge variant={u.role === "admin" ? "info" : "default"}>
                           {u.role}
                         </Badge>
                       </div>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500 mb-3">
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs text-gray-500 mb-2">
                         <div>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">Phone: </span>
+                          <span className="font-medium text-gray-600 dark:text-gray-400">Phone: </span>
                           {u.phone || "—"}
                         </div>
                         <div>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">Bank: </span>
+                          <span className="font-medium text-gray-600 dark:text-gray-400">Bank: </span>
                           {u.bankName || "—"}
                         </div>
                         <div>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">Joined: </span>
+                          <span className="font-medium text-gray-600 dark:text-gray-400">Joined: </span>
                           {new Date(u.createdAt).toLocaleDateString("en-ZA")}
                         </div>
                       </div>
                       <button
                         onClick={() => setSelectedUser(u)}
-                        className="w-full py-2 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+                        className="w-full py-1.5 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
                       >
                         Manage User
                       </button>

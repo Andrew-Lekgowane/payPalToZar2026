@@ -16,7 +16,7 @@ export default function Card({
   return (
     <div
       className={`
-        rounded-2xl border border-gray-100 bg-white p-6
+        rounded-2xl border border-gray-100 bg-white p-4 md:p-6
         dark:border-gray-800 dark:bg-gray-900
         ${hover ? "hover:shadow-xl hover:shadow-violet-500/5 hover:-translate-y-1 transition-all duration-300" : ""}
         ${gradient ? "bg-linear-to-br from-white to-violet-50 dark:from-gray-900 dark:to-violet-950/20" : ""}
