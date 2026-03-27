@@ -37,6 +37,18 @@ import Badge from "@/components/ui/Badge";
 import Heading from "@/components/ui/Heading";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+
+const bankOptions = [
+  { value: "FNB",             label: "FNB (First National Bank)" },
+  { value: "Standard Bank",   label: "Standard Bank" },
+  { value: "Absa",            label: "Absa" },
+  { value: "Nedbank",         label: "Nedbank" },
+  { value: "Capitec",         label: "Capitec" },
+  { value: "TymeBank",        label: "TymeBank" },
+  { value: "African Bank",    label: "African Bank" },
+  { value: "Discovery Bank",  label: "Discovery Bank" },
+];
 
 interface AdminTransaction {
   _id: string;
@@ -1183,7 +1195,7 @@ export default function AdminPage() {
                 <div className="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Bank Details</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Input label="Bank Name" value={editForm.bankName} onChange={(e) => setEditForm({ ...editForm, bankName: e.target.value })} />
+                    <Select label="Bank Name" options={bankOptions} value={editForm.bankName} onChange={(e) => setEditForm({ ...editForm, bankName: e.target.value })} />
                     <Input label="Account Holder" value={editForm.accountHolder} onChange={(e) => setEditForm({ ...editForm, accountHolder: e.target.value })} />
                     <Input label="Account Number" value={editForm.accountNumber} onChange={(e) => setEditForm({ ...editForm, accountNumber: e.target.value })} />
                     <Input label="Branch Code" value={editForm.branchCode} onChange={(e) => setEditForm({ ...editForm, branchCode: e.target.value })} />
@@ -1247,7 +1259,7 @@ export default function AdminPage() {
           <div className="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Bank Details (optional)</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input label="Bank Name" placeholder="e.g. FNB" value={createForm.bankName} onChange={(e) => setCreateForm({ ...createForm, bankName: e.target.value })} />
+              <Select label="Bank Name" options={bankOptions} value={createForm.bankName} onChange={(e) => setCreateForm({ ...createForm, bankName: e.target.value })} />
               <Input label="Account Holder" placeholder="Full name on account" value={createForm.accountHolder} onChange={(e) => setCreateForm({ ...createForm, accountHolder: e.target.value })} />
               <Input label="Account Number" value={createForm.accountNumber} onChange={(e) => setCreateForm({ ...createForm, accountNumber: e.target.value })} />
               <Input label="Branch Code" value={createForm.branchCode} onChange={(e) => setCreateForm({ ...createForm, branchCode: e.target.value })} />
