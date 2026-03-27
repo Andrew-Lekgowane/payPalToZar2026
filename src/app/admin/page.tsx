@@ -26,6 +26,8 @@ import {
   Plus,
   Pencil,
   UserPlus,
+  Wallet,
+  CalendarDays,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/layout/Navbar";
@@ -335,16 +337,30 @@ export default function AdminPage() {
     }
   };
 
+  // Earnings period filter
+  const [earningsFilter, setEarningsFilter] = useState<"week" | "month" | "6months" | "year" | "all">("month");
+
   // Stats
-  const totalZARPaid = transactions
-    .filter((t) => t.status === "completed")
-    .reduce((a, t) => a + t.amountZAR, 0);
+  const completedTx = transactions.filter((t) => t.status === "completed");
+  const totalZARPaid = completedTx.reduce((a, t) => a + t.amountZAR, 0);
+  const totalFeesEarned = completedTx.reduce((a, t) => a + t.serviceFee, 0);
   const pendingCount = transactions.filter((t) =>
     ["pending", "verifying"].includes(t.status),
   ).length;
-  const completedCount = transactions.filter(
-    (t) => t.status === "completed",
-  ).length;
+  const completedCount = completedTx.length;
+
+  // Earnings filtered by period
+  const earningsCutoff = (): Date => {
+    const now = new Date();
+    if (earningsFilter === "week")    { now.setDate(now.getDate() - 7); return now; }
+    if (earningsFilter === "month")   { now.setMonth(now.getMonth() - 1); return now; }
+    if (earningsFilter === "6months") { now.setMonth(now.getMonth() - 6); return now; }
+    if (earningsFilter === "year")    { now.setFullYear(now.getFullYear() - 1); return now; }
+    return new Date(0); // "all"
+  };
+  const periodTx = completedTx.filter((t) => new Date(t.createdAt) >= earningsCutoff());
+  const periodFees = periodTx.reduce((a, t) => a + t.serviceFee, 0);
+  const periodZAR  = periodTx.reduce((a, t) => a + t.amountZAR, 0);
 
   const filteredTx =
     statusFilter === "all"
@@ -434,6 +450,58 @@ export default function AdminPage() {
               </div>
             </Card>
           </div>
+
+          {/* ── Earnings Card ── */}
+          <Card className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+              <div className="flex items-center gap-2">
+                <Wallet className="w-5 h-5 text-violet-500" />
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">Your Earnings (Service Fees)</h3>
+              </div>
+              {/* Period filter pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <CalendarDays className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                {(["week", "month", "6months", "year", "all"] as const).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setEarningsFilter(p)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
+                      earningsFilter === p
+                        ? "bg-violet-600 text-white"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-violet-100 dark:hover:bg-violet-900/30"
+                    }`}
+                  >
+                    {p === "week" ? "This Week" : p === "month" ? "This Month" : p === "6months" ? "6 Months" : p === "year" ? "This Year" : "All Time"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {/* Main earnings highlight */}
+              <div className="col-span-2 p-4 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600 text-white">
+                <p className="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">You Earned</p>
+                <p className="text-3xl font-bold">${periodFees.toFixed(2)}</p>
+                <p className="text-xs opacity-70 mt-1">
+                  from {periodTx.length} completed transaction{periodTx.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+              {/* ZAR paid out in period */}
+              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wide mb-1">ZAR Paid Out</p>
+                <p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+                  R{periodZAR.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-xs text-emerald-500 mt-1">in this period</p>
+              </div>
+              {/* All-time totals */}
+              <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">All-Time Earned</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">${totalFeesEarned.toFixed(2)}</p>
+                <p className="text-xs text-gray-400 mt-1">{completedCount} total completed</p>
+              </div>
+            </div>
+          </Card>
 
           {/* Tabs */}
           <div className="flex gap-2 mb-6">
@@ -729,15 +797,18 @@ export default function AdminPage() {
                   ${selectedTx.amountUSD.toFixed(2)}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 text-center">
-                <p className="text-xs text-red-500 mb-1">Service Fee</p>
-                <p className="font-bold text-red-600 text-lg">
-                  -${selectedTx.serviceFee.toFixed(2)}
+              <div className="p-3 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 text-center">
+                <p className="text-xs text-violet-100 mb-1 font-semibold">💰 You Receive</p>
+                <p className="font-bold text-white text-lg">
+                  ${selectedTx.serviceFee.toFixed(2)}
+                </p>
+                <p className="text-xs text-violet-200 mt-0.5">
+                  ({Math.round((selectedTx.serviceFee / selectedTx.amountUSD) * 100)}% fee)
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-center">
                 <p className="text-xs text-emerald-600 mb-1">
-                  You Must Pay Out
+                  Pay Out to User
                 </p>
                 <p className="font-bold text-emerald-700 dark:text-emerald-300 text-lg">
                   R{selectedTx.amountZAR.toFixed(2)}
