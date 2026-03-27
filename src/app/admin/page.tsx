@@ -477,7 +477,7 @@ export default function AdminPage() {
                 <h3 className="text-base font-bold text-gray-900 dark:text-white">Your Earnings (Service Fees)</h3>
               </div>
               {/* Period filter pills */}
-              <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 min-w-0">
                 <CalendarDays className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                 {(["week", "month", "6months", "year", "all"] as const).map((p) => (
                   <button
@@ -495,9 +495,9 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Main earnings highlight */}
-              <div className="col-span-2 p-4 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600 text-white">
+              <div className="col-span-1 sm:col-span-2 p-4 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600 text-white">
                 <p className="text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">You Earned</p>
                 <p className="text-3xl font-bold">${periodFees.toFixed(2)}</p>
                 <p className="text-xs opacity-70 mt-1">
@@ -547,16 +547,16 @@ export default function AdminPage() {
           {tab === "transactions" && (
             <Card>
               {/* Filter bar */}
-              <div className="flex items-center gap-2 mb-4 flex-wrap">
-                <Filter className="w-4 h-4 text-gray-400" />
-                <span className="text-xs text-gray-500 font-medium">
+              <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
+                <Filter className="w-4 h-4 text-gray-400 shrink-0" />
+                <span className="text-xs text-gray-500 font-medium shrink-0">
                   Filter:
                 </span>
                 {ALL_STATUSES.map((s) => (
                   <button
                     key={s}
                     onClick={() => setStatusFilter(s)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${
+                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors shrink-0 ${
                       statusFilter === s
                         ? "bg-violet-600 text-white"
                         : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-violet-100 dark:hover:bg-violet-900/30"
@@ -572,7 +572,77 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Mobile card list */}
+              <div className="md:hidden space-y-3">
+                {filteredTx.length === 0 ? (
+                  <p className="py-10 text-center text-gray-400 text-sm">
+                    No transactions found
+                  </p>
+                ) : (
+                  filteredTx.map((tx) => {
+                    const cfg = statusConfig[tx.status] || statusConfig.pending;
+                    return (
+                      <div
+                        key={tx._id}
+                        className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                              {tx.userId?.name || "Unknown"}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {tx.userId?.email}
+                            </p>
+                          </div>
+                          <Badge variant={cfg.variant}>{cfg.label}</Badge>
+                        </div>
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <p className="text-xs text-gray-500">Sent</p>
+                            <p className="font-bold text-gray-900 dark:text-white">
+                              ${tx.amountUSD.toFixed(2)}
+                            </p>
+                          </div>
+                          <span className="text-xl text-gray-300 dark:text-gray-600">→</span>
+                          <div className="text-right">
+                            <p className="text-xs text-gray-500">Pay Out</p>
+                            <p className="font-bold text-emerald-600">
+                              R{tx.amountZAR.toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-gray-500">Proof</p>
+                            {tx.proofScreenshot ? (
+                              <span className="text-xs text-emerald-600 font-semibold">✓ Yes</span>
+                            ) : (
+                              <span className="text-xs text-gray-400">None</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between mt-3">
+                          <span className="text-xs text-gray-400">
+                            {new Date(tx.createdAt).toLocaleDateString("en-ZA")}
+                          </span>
+                          <button
+                            onClick={() => {
+                              setSelectedTx(tx);
+                              setAdminNote(tx.adminNote || "");
+                              setShowScreenshot(false);
+                            }}
+                            className="px-4 py-1.5 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+                          >
+                            Manage
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
@@ -686,7 +756,56 @@ export default function AdminPage() {
                   Add User
                 </Button>
               </div>
-              <div className="overflow-x-auto">
+              {/* Mobile card list */}
+              <div className="md:hidden space-y-3">
+                {users.length === 0 ? (
+                  <p className="py-10 text-center text-gray-400 text-sm">
+                    No users found
+                  </p>
+                ) : (
+                  users.map((u) => (
+                    <div
+                      key={u._id}
+                      className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                            {u.name}
+                          </p>
+                          <p className="text-xs text-gray-500">{u.email}</p>
+                        </div>
+                        <Badge variant={u.role === "admin" ? "info" : "default"}>
+                          {u.role}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500 mb-3">
+                        <div>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">Phone: </span>
+                          {u.phone || "—"}
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">Bank: </span>
+                          {u.bankName || "—"}
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">Joined: </span>
+                          {new Date(u.createdAt).toLocaleDateString("en-ZA")}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelectedUser(u)}
+                        className="w-full py-2 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+                      >
+                        Manage User
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
@@ -786,7 +905,7 @@ export default function AdminPage() {
         {selectedTx && (
           <div className="space-y-5">
             {/* User info */}
-            <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 grid grid-cols-2 gap-3 text-sm">
+            <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-xs text-gray-500 mb-0.5">Customer</p>
                 <p className="font-semibold text-gray-900 dark:text-white">
@@ -808,7 +927,7 @@ export default function AdminPage() {
             </div>
 
             {/* Amount summary */}
-            <div className="grid grid-cols-3 gap-3 text-sm">
+            <div className="grid grid-cols-3 gap-2 text-sm">
               <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-center">
                 <p className="text-xs text-blue-500 mb-1">They Sent (PayPal)</p>
                 <p className="font-bold text-blue-700 dark:text-blue-300 text-lg">
@@ -842,7 +961,7 @@ export default function AdminPage() {
                   Payout Bank Details — EFT to these details
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-xs text-gray-500 mb-0.5">Bank</p>
                   <div className="flex items-center">

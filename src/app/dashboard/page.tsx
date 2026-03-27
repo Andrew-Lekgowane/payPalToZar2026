@@ -517,7 +517,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
               </div>
-              <Button size="sm" onClick={openConvertWithAmount}>
+              <Button size="sm" onClick={openConvertWithAmount} className="w-full sm:w-auto whitespace-nowrap">
                 <Plus className="w-4 h-4 mr-1" />
                 Convert Now
               </Button>
@@ -549,7 +549,69 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              {/* Mobile card list */}
+              <div className="md:hidden space-y-3">
+                {transactions.map((tx) => {
+                  const cfg = statusConfig[tx.status] || statusConfig.pending;
+                  return (
+                    <div
+                      key={tx._id}
+                      className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800/50"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs text-gray-500">
+                          {new Date(tx.createdAt).toLocaleDateString("en-ZA")}
+                        </span>
+                        <Badge variant={cfg.variant}>{cfg.label}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">You Sent</p>
+                          <p className="text-lg font-bold text-gray-900 dark:text-white">
+                            ${tx.amountUSD.toFixed(2)}
+                          </p>
+                        </div>
+                        <span className="text-2xl text-gray-300 dark:text-gray-600">→</span>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 mb-0.5">You Receive</p>
+                          <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                            R{tx.amountZAR.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-red-400 mb-3">
+                        Service fee: -${tx.serviceFee.toFixed(2)}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setSelectedTx(tx)}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold text-violet-600 border border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+                        >
+                          View Details
+                        </button>
+                        {(tx.status === "pending" ||
+                          (tx.status === "verifying" &&
+                            !tx.paypalTransactionId)) && (
+                          <button
+                            onClick={() => {
+                              setShowProof(tx._id);
+                              setProofTxId("");
+                              setProofScreenshot("");
+                              setProofScreenshotName("");
+                            }}
+                            className="flex-1 py-2 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-colors"
+                          >
+                            Upload Proof
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
@@ -642,7 +704,7 @@ export default function DashboardPage() {
       >
         {selectedTx && (
           <div className="space-y-3 text-sm">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <p className="text-gray-500 text-xs mb-1">Date</p>
                 <p className="font-medium text-gray-900 dark:text-white">
