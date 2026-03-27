@@ -549,6 +549,7 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
+              <>
               {/* Mobile card list */}
               <div className="md:hidden space-y-3">
                 {transactions.map((tx) => {
@@ -689,6 +690,7 @@ export default function DashboardPage() {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </Card>
         </div>
