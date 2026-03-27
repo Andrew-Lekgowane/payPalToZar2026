@@ -56,7 +56,8 @@ const EXCHANGE_RATE = 18.5;
 const SERVICE_FEE_PERCENT = 35;
 const MIN_AMOUNT_USD = 5;
 const MAX_AMOUNT_USD = 100;
-const PAYPAL_EMAIL = process.env.NEXT_PUBLIC_PAYPAL_EMAIL || "payments@annathanpay.co.za";
+const PAYPAL_EMAIL =
+  process.env.NEXT_PUBLIC_PAYPAL_EMAIL || "payments@annathanpay.co.za";
 
 const bankOptions = [
   { value: "FNB", label: "FNB (First National Bank)" },
@@ -69,7 +70,13 @@ const bankOptions = [
   { value: "Discovery Bank", label: "Discovery Bank" },
 ];
 
-const statusConfig: Record<string, { variant: "default" | "success" | "warning" | "danger" | "info"; label: string }> = {
+const statusConfig: Record<
+  string,
+  {
+    variant: "default" | "success" | "warning" | "danger" | "info";
+    label: string;
+  }
+> = {
   pending: { variant: "warning", label: "Pending" },
   verifying: { variant: "info", label: "Verifying" },
   processing: { variant: "info", label: "Processing" },
@@ -113,12 +120,20 @@ export default function DashboardPage() {
 
   // Profile form
   const [profileForm, setProfileForm] = useState<UserProfile>({
-    name: "", email: "", phone: "",
-    bankName: "", accountNumber: "", accountHolder: "", branchCode: "",
+    name: "",
+    email: "",
+    phone: "",
+    bankName: "",
+    accountNumber: "",
+    accountHolder: "",
+    branchCode: "",
   });
   const [profileSaving, setProfileSaving] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchData = useCallback(async (showToast = false) => {
+    setRefreshing(true);
     try {
       const [txRes, profileRes] = await Promise.all([
         fetch("/api/transactions"),
@@ -131,15 +146,20 @@ export default function DashboardPage() {
         setProfile(profileData.user);
         setProfileForm(profileData.user);
       }
+      if (showToast) toast.success("Transactions refreshed");
     } catch {
       toast.error("Failed to load data");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") { router.push("/login"); return; }
+    if (status === "unauthenticated") {
+      router.push("/login");
+      return;
+    }
     if (status === "authenticated") {
       fetchData();
       // Auto-refresh every 30 seconds so admin status changes appear automatically
@@ -167,7 +187,11 @@ export default function DashboardPage() {
     setShowConvert(true);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, setter: (v: string) => void, nameSetter: (v: string) => void) => {
+  const handleFileSelect = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: (v: string) => void,
+    nameSetter: (v: string) => void,
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -231,12 +255,18 @@ export default function DashboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      toast.success("Done! We received your request and will process it shortly.");
+      toast.success(
+        "Done! We received your request and will process it shortly.",
+      );
       setShowConvert(false);
       resetConvertModal();
       fetchData();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -266,7 +296,9 @@ export default function DashboardPage() {
       setProofScreenshotName("");
       fetchData();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to submit proof");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to submit proof",
+      );
     } finally {
       setProofSubmitting(false);
     }
@@ -286,15 +318,23 @@ export default function DashboardPage() {
       setProfile(data.user);
       setShowProfile(false);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to update profile");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update profile",
+      );
     } finally {
       setProfileSaving(false);
     }
   };
 
-  const totalConverted = transactions.filter((t) => t.status === "completed").reduce((acc, t) => acc + t.amountZAR, 0);
-  const pendingCount = transactions.filter((t) => ["pending", "verifying", "processing"].includes(t.status)).length;
-  const completedCount = transactions.filter((t) => t.status === "completed").length;
+  const totalConverted = transactions
+    .filter((t) => t.status === "completed")
+    .reduce((acc, t) => acc + t.amountZAR, 0);
+  const pendingCount = transactions.filter((t) =>
+    ["pending", "verifying", "processing"].includes(t.status),
+  ).length;
+  const completedCount = transactions.filter(
+    (t) => t.status === "completed",
+  ).length;
 
   const previewUSD = parseFloat(amountUSD) || 0;
   const previewFee = (previewUSD * SERVICE_FEE_PERCENT) / 100;
@@ -303,8 +343,8 @@ export default function DashboardPage() {
     ? previewUSD < MIN_AMOUNT_USD
       ? `Minimum amount is $${MIN_AMOUNT_USD} USD`
       : previewUSD > MAX_AMOUNT_USD
-      ? `Maximum is $${MAX_AMOUNT_USD} USD per transaction`
-      : null
+        ? `Maximum is $${MAX_AMOUNT_USD} USD per transaction`
+        : null
     : null;
 
   if (status === "loading" || loading) {
@@ -323,19 +363,32 @@ export default function DashboardPage() {
       <Navbar />
       <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
-              <Heading as="h3">Welcome back, {session?.user?.name?.split(" ")[0]} 👋</Heading>
-              <p className="text-gray-500 mt-1">Convert your PayPal money to Rands — fast and easy</p>
+              <Heading as="h3">
+                Welcome back, {session?.user?.name?.split(" ")[0]} 👋
+              </Heading>
+              <p className="text-gray-500 mt-1">
+                Convert your PayPal money to Rands — fast and easy
+              </p>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" size="sm" onClick={() => setShowProfile(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowProfile(true)}
+              >
                 <User className="w-4 h-4 mr-1.5" />
                 My Profile
               </Button>
-              <Button size="sm" onClick={() => { resetConvertModal(); setShowConvert(true); }}>
+              <Button
+                size="sm"
+                onClick={() => {
+                  resetConvertModal();
+                  setShowConvert(true);
+                }}
+              >
                 <Plus className="w-4 h-4 mr-1.5" />
                 Convert Money
               </Button>
@@ -352,7 +405,10 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-sm text-gray-500">Total Received (ZAR)</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    R{totalConverted.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+                    R
+                    {totalConverted.toLocaleString("en-ZA", {
+                      minimumFractionDigits: 2,
+                    })}
                   </p>
                 </div>
               </div>
@@ -364,7 +420,9 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">In Progress</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{pendingCount}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {pendingCount}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -375,7 +433,9 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{completedCount}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {completedCount}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -387,10 +447,13 @@ export default function DashboardPage() {
               <Building2 className="w-5 h-5 text-amber-500 shrink-0" />
               <p className="text-sm text-amber-700 dark:text-amber-300">
                 ⚠️ Before you can convert money, please{" "}
-                <button onClick={() => setShowProfile(true)} className="font-bold underline">
+                <button
+                  onClick={() => setShowProfile(true)}
+                  className="font-bold underline"
+                >
                   add your bank account details
-                </button>
-                {" "}so we know where to send your Rands.
+                </button>{" "}
+                so we know where to send your Rands.
               </p>
             </div>
           )}
@@ -404,11 +467,17 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row gap-4 items-end">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-medium text-gray-500">Enter your USD amount</label>
-                  <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">Min $5 — Max $100</span>
+                  <label className="text-xs font-medium text-gray-500">
+                    Enter your USD amount
+                  </label>
+                  <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                    Min $5 — Max $100
+                  </span>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">
+                    $
+                  </span>
                   <input
                     type="number"
                     min={MIN_AMOUNT_USD}
@@ -425,7 +494,9 @@ export default function DashboardPage() {
                   />
                 </div>
                 {amountError && (
-                  <p className="text-xs text-red-500 font-medium mt-1">{amountError}</p>
+                  <p className="text-xs text-red-500 font-medium mt-1">
+                    {amountError}
+                  </p>
                 )}
               </div>
               <div className="flex-1 p-3 rounded-xl bg-gray-50 dark:bg-gray-800 space-y-1.5 text-sm">
@@ -435,7 +506,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Service Fee ({SERVICE_FEE_PERCENT}%)</span>
-                  <span className="text-red-500">-${previewFee > 0 ? previewFee.toFixed(2) : "0.00"}</span>
+                  <span className="text-red-500">
+                    -${previewFee > 0 ? previewFee.toFixed(2) : "0.00"}
+                  </span>
                 </div>
                 <div className="flex justify-between font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-1.5">
                   <span>You will receive</span>
@@ -454,9 +527,16 @@ export default function DashboardPage() {
           {/* Transactions */}
           <Card>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">My Past Transactions</h3>
-              <button onClick={fetchData} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Refresh">
-                <RefreshCw className="w-4 h-4" />
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                My Past Transactions
+              </h3>
+              <button
+                onClick={() => fetchData(true)}
+                disabled={refreshing}
+                className="p-2 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/30 disabled:opacity-50 transition-colors"
+                title="Refresh transactions"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
               </button>
             </div>
 
@@ -464,26 +544,44 @@ export default function DashboardPage() {
               <div className="text-center py-12 text-gray-400">
                 <ArrowRightLeft className="w-10 h-10 mx-auto mb-3 opacity-50" />
                 <p className="font-medium text-base">No transactions yet</p>
-                <p className="text-sm mt-1">Tap "Convert Money" above to get started!</p>
+                <p className="text-sm mt-1">
+                  Tap "Convert Money" above to get started!
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Date</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Sent (USD)</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Received (ZAR)</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Fee</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Details</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
+                        Date
+                      </th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
+                        Sent (USD)
+                      </th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
+                        Received (ZAR)
+                      </th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
+                        Fee
+                      </th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
+                        Status
+                      </th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
+                        Details
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {transactions.map((tx) => {
-                      const cfg = statusConfig[tx.status] || statusConfig.pending;
+                      const cfg =
+                        statusConfig[tx.status] || statusConfig.pending;
                       return (
-                        <tr key={tx._id} className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+                        <tr
+                          key={tx._id}
+                          className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30"
+                        >
                           <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-300">
                             {new Date(tx.createdAt).toLocaleDateString("en-ZA")}
                           </td>
@@ -507,7 +605,9 @@ export default function DashboardPage() {
                             >
                               <Eye className="w-4 h-4" />
                             </button>
-                            {(tx.status === "pending" || (tx.status === "verifying" && !tx.paypalTransactionId)) && (
+                            {(tx.status === "pending" ||
+                              (tx.status === "verifying" &&
+                                !tx.paypalTransactionId)) && (
                               <button
                                 onClick={() => {
                                   setShowProof(tx._id);
@@ -534,51 +634,81 @@ export default function DashboardPage() {
       <Footer />
 
       {/* ─── Transaction Detail Modal ─── */}
-      <Modal isOpen={!!selectedTx} onClose={() => setSelectedTx(null)} title="Transaction Details" size="lg">
+      <Modal
+        isOpen={!!selectedTx}
+        onClose={() => setSelectedTx(null)}
+        title="Transaction Details"
+        size="lg"
+      >
         {selectedTx && (
           <div className="space-y-3 text-sm">
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <p className="text-gray-500 text-xs mb-1">Date</p>
-                <p className="font-medium text-gray-900 dark:text-white">{new Date(selectedTx.createdAt).toLocaleString("en-ZA")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  {new Date(selectedTx.createdAt).toLocaleString("en-ZA")}
+                </p>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <p className="text-gray-500 text-xs mb-1">Status</p>
-                <Badge variant={(statusConfig[selectedTx.status] || statusConfig.pending).variant}>
-                  {(statusConfig[selectedTx.status] || statusConfig.pending).label}
+                <Badge
+                  variant={
+                    (statusConfig[selectedTx.status] || statusConfig.pending)
+                      .variant
+                  }
+                >
+                  {
+                    (statusConfig[selectedTx.status] || statusConfig.pending)
+                      .label
+                  }
                 </Badge>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <p className="text-gray-500 text-xs mb-1">You Sent (USD)</p>
-                <p className="font-bold text-gray-900 dark:text-white text-lg">${selectedTx.amountUSD.toFixed(2)}</p>
+                <p className="font-bold text-gray-900 dark:text-white text-lg">
+                  ${selectedTx.amountUSD.toFixed(2)}
+                </p>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <p className="text-gray-500 text-xs mb-1">You Received (ZAR)</p>
-                <p className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">R{selectedTx.amountZAR.toFixed(2)}</p>
+                <p className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">
+                  R{selectedTx.amountZAR.toFixed(2)}
+                </p>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <p className="text-gray-500 text-xs mb-1">Exchange Rate</p>
-                <p className="font-medium text-gray-900 dark:text-white">1 USD = R{selectedTx.exchangeRate}</p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  1 USD = R{selectedTx.exchangeRate}
+                </p>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <p className="text-gray-500 text-xs mb-1">Service Fee</p>
-                <p className="font-medium text-red-500">-${selectedTx.serviceFee.toFixed(2)} ({SERVICE_FEE_PERCENT}%)</p>
+                <p className="font-medium text-red-500">
+                  -${selectedTx.serviceFee.toFixed(2)} ({SERVICE_FEE_PERCENT}%)
+                </p>
               </div>
             </div>
             <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
-              <p className="text-gray-500 text-xs mb-1">PayPal Transaction ID</p>
+              <p className="text-gray-500 text-xs mb-1">
+                PayPal Transaction ID
+              </p>
               <p className="font-mono text-gray-900 dark:text-white break-all">
                 {selectedTx.paypalTransactionId || "Not provided"}
               </p>
             </div>
-            {(selectedTx.status === "pending" || (selectedTx.status === "verifying" && !selectedTx.paypalTransactionId)) && (
-              <Button fullWidth onClick={() => {
-                setSelectedTx(null);
-                setShowProof(selectedTx._id);
-                setProofTxId("");
-                setProofScreenshot("");
-                setProofScreenshotName("");
-              }}>
+            {(selectedTx.status === "pending" ||
+              (selectedTx.status === "verifying" &&
+                !selectedTx.paypalTransactionId)) && (
+              <Button
+                fullWidth
+                onClick={() => {
+                  setSelectedTx(null);
+                  setShowProof(selectedTx._id);
+                  setProofTxId("");
+                  setProofScreenshot("");
+                  setProofScreenshotName("");
+                }}
+              >
                 Upload Payment Proof
               </Button>
             )}
@@ -589,11 +719,16 @@ export default function DashboardPage() {
       {/* ─── Convert Wizard Modal ─── */}
       <Modal
         isOpen={showConvert}
-        onClose={() => { setShowConvert(false); resetConvertModal(); }}
+        onClose={() => {
+          setShowConvert(false);
+          resetConvertModal();
+        }}
         title={
-          convertStep === 1 ? "Step 1 of 3 — How much do you want to convert?" :
-          convertStep === 2 ? "Step 2 of 3 — Send the money on PayPal" :
-          "Step 3 of 3 — Upload your proof of payment"
+          convertStep === 1
+            ? "Step 1 of 3 — How much do you want to convert?"
+            : convertStep === 2
+              ? "Step 2 of 3 — Send the money on PayPal"
+              : "Step 3 of 3 — Upload your proof of payment"
         }
         size="lg"
       >
@@ -601,14 +736,22 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2 mb-6">
           {[1, 2, 3].map((s) => (
             <div key={s} className="flex items-center gap-2 flex-1">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                s < convertStep ? "bg-emerald-500 text-white" :
-                s === convertStep ? "bg-violet-600 text-white" :
-                "bg-gray-200 dark:bg-gray-700 text-gray-400"
-              }`}>
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                  s < convertStep
+                    ? "bg-emerald-500 text-white"
+                    : s === convertStep
+                      ? "bg-violet-600 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-400"
+                }`}
+              >
                 {s < convertStep ? <CheckCircle className="w-4 h-4" /> : s}
               </div>
-              {s < 3 && <div className={`h-0.5 flex-1 rounded ${s < convertStep ? "bg-emerald-500" : "bg-gray-200 dark:bg-gray-700"}`} />}
+              {s < 3 && (
+                <div
+                  className={`h-0.5 flex-1 rounded ${s < convertStep ? "bg-emerald-500" : "bg-gray-200 dark:bg-gray-700"}`}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -617,14 +760,18 @@ export default function DashboardPage() {
         {convertStep === 1 && (
           <div className="space-y-5">
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Type in the amount of US Dollars you want to convert to Rands. The minimum is <strong>$5</strong> and the maximum is <strong>$100</strong> per transaction.
+              Type in the amount of US Dollars you want to convert to Rands. The
+              minimum is <strong>$5</strong> and the maximum is{" "}
+              <strong>$100</strong> per transaction.
             </p>
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
                 How many dollars do you want to convert?
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-lg">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-lg">
+                  $
+                </span>
                 <input
                   type="number"
                   min={MIN_AMOUNT_USD}
@@ -642,31 +789,47 @@ export default function DashboardPage() {
                 />
               </div>
               {amountError ? (
-                <p className="text-sm text-red-500 font-semibold mt-1.5">⚠️ {amountError}</p>
+                <p className="text-sm text-red-500 font-semibold mt-1.5">
+                  ⚠️ {amountError}
+                </p>
               ) : (
-                <p className="text-xs text-gray-400 mt-1.5">Minimum: $5 &nbsp;|&nbsp; Maximum: $100</p>
+                <p className="text-xs text-gray-400 mt-1.5">
+                  Minimum: $5 &nbsp;|&nbsp; Maximum: $100
+                </p>
               )}
             </div>
 
             {previewUSD >= MIN_AMOUNT_USD && previewUSD <= MAX_AMOUNT_USD && (
               <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 space-y-2">
-                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">Your breakdown</p>
+                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">
+                  Your breakdown
+                </p>
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                   <span>You send on PayPal</span>
-                  <span className="font-semibold">${previewUSD.toFixed(2)}</span>
+                  <span className="font-semibold">
+                    ${previewUSD.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>Our service fee ({SERVICE_FEE_PERCENT}%)</span>
-                  <span className="text-red-500">-${previewFee.toFixed(2)}</span>
+                  <span className="text-red-500">
+                    -${previewFee.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-gray-900 dark:text-white border-t border-emerald-200 dark:border-emerald-700 pt-2">
                   <span>💰 You will receive</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 text-base">R{previewZAR}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 text-base">
+                    R{previewZAR}
+                  </span>
                 </div>
               </div>
             )}
 
-            <Button fullWidth onClick={handleStep1Next} disabled={!amountUSD || !!amountError}>
+            <Button
+              fullWidth
+              onClick={handleStep1Next}
+              disabled={!amountUSD || !!amountError}
+            >
               Looks good, next step
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -677,37 +840,62 @@ export default function DashboardPage() {
         {convertStep === 2 && (
           <div className="space-y-5">
             <div className="p-4 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800">
-              <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1">You need to send:</p>
-              <p className="text-3xl font-bold text-violet-700 dark:text-violet-300">${parseFloat(amountUSD).toFixed(2)}</p>
+              <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1">
+                You need to send:
+              </p>
+              <p className="text-3xl font-bold text-violet-700 dark:text-violet-300">
+                ${parseFloat(amountUSD).toFixed(2)}
+              </p>
             </div>
 
             <div className="space-y-3">
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Follow these steps on PayPal:</p>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                Follow these steps on PayPal:
+              </p>
 
               {[
-                { num: "1", text: "Open your PayPal app on your phone (or go to paypal.com on a computer)" },
+                {
+                  num: "1",
+                  text: "Open your PayPal app on your phone (or go to paypal.com on a computer)",
+                },
                 { num: "2", text: 'Tap "Send Money" or "Send & Request"' },
-                { num: "3", text: `Send exactly $${parseFloat(amountUSD).toFixed(2)} to the email address below` },
-                { num: "4", text: "Take a screenshot of the payment confirmation screen — you will need it in the next step" },
+                {
+                  num: "3",
+                  text: `Send exactly $${parseFloat(amountUSD).toFixed(2)} to the email address below`,
+                },
+                {
+                  num: "4",
+                  text: "Take a screenshot of the payment confirmation screen — you will need it in the next step",
+                },
               ].map((step) => (
                 <div key={step.num} className="flex gap-3 items-start">
                   <div className="w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">
                     {step.num}
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{step.text}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {step.text}
+                  </p>
                 </div>
               ))}
             </div>
 
             <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-gray-500 mb-1">Send PayPal payment to this email:</p>
+              <p className="text-xs text-gray-500 mb-1">
+                Send PayPal payment to this email:
+              </p>
               <div className="flex items-center justify-between gap-3">
-                <p className="font-mono font-bold text-gray-900 dark:text-white text-sm break-all">{PAYPAL_EMAIL}</p>
+                <p className="font-mono font-bold text-gray-900 dark:text-white text-sm break-all">
+                  {PAYPAL_EMAIL}
+                </p>
                 <button
                   onClick={handleCopyEmail}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-semibold shrink-0 hover:bg-violet-200 transition-colors"
                 >
-                  {copied ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? (
+                    <CheckCircle className="w-3.5 h-3.5" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
                   {copied ? "Copied!" : "Copy"}
                 </button>
               </div>
@@ -715,7 +903,9 @@ export default function DashboardPage() {
 
             <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
               <p className="text-xs text-amber-700 dark:text-amber-300">
-                📸 <strong>Important:</strong> After sending, take a screenshot of the PayPal confirmation. You will upload it in the next step as proof of payment.
+                📸 <strong>Important:</strong> After sending, take a screenshot
+                of the PayPal confirmation. You will upload it in the next step
+                as proof of payment.
               </p>
             </div>
 
@@ -736,29 +926,42 @@ export default function DashboardPage() {
         {convertStep === 3 && (
           <div className="space-y-5">
             <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-              Upload the screenshot you took of your PayPal payment. This helps us verify your payment quickly.
+              Upload the screenshot you took of your PayPal payment. This helps
+              us verify your payment quickly.
             </p>
 
             {/* Screenshot upload — REQUIRED */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                📸 Upload your PayPal screenshot <span className="text-red-500">*</span>
+                📸 Upload your PayPal screenshot{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => handleFileSelect(e, setScreenshotFile, setScreenshotName)}
+                onChange={(e) =>
+                  handleFileSelect(e, setScreenshotFile, setScreenshotName)
+                }
               />
               {screenshotFile ? (
                 <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300 truncate">{screenshotName}</p>
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400">Screenshot uploaded ✓</p>
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300 truncate">
+                      {screenshotName}
+                    </p>
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                      Screenshot uploaded ✓
+                    </p>
                   </div>
-                  <button onClick={() => fileInputRef.current?.click()} className="text-xs text-emerald-600 underline">Change</button>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs text-emerald-600 underline"
+                  >
+                    Change
+                  </button>
                 </div>
               ) : (
                 <button
@@ -766,7 +969,9 @@ export default function DashboardPage() {
                   className="w-full p-6 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-violet-400 dark:hover:border-violet-500 transition-colors flex flex-col items-center gap-2 text-gray-400 hover:text-violet-500"
                 >
                   <ImageIcon className="w-8 h-8" />
-                  <p className="text-sm font-semibold">Tap here to choose your screenshot</p>
+                  <p className="text-sm font-semibold">
+                    Tap here to choose your screenshot
+                  </p>
                   <p className="text-xs">JPG, PNG — max 5MB</p>
                 </button>
               )}
@@ -775,10 +980,13 @@ export default function DashboardPage() {
             {/* Transaction ID — OPTIONAL */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
-                PayPal Transaction ID <span className="text-gray-400 font-normal">(optional)</span>
+                PayPal Transaction ID{" "}
+                <span className="text-gray-400 font-normal">(optional)</span>
               </label>
               <p className="text-xs text-gray-500 mb-2">
-                Adding your transaction ID helps us verify your payment <strong>faster</strong>. You can find it in your PayPal confirmation email or app under Activity.
+                Adding your transaction ID helps us verify your payment{" "}
+                <strong>faster</strong>. You can find it in your PayPal
+                confirmation email or app under Activity.
               </p>
               <input
                 type="text"
@@ -791,7 +999,9 @@ export default function DashboardPage() {
 
             <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                ✅ Once you submit, we will verify your payment and send your Rands to your bank account. You will see the status update in your transaction history.
+                ✅ Once you submit, we will verify your payment and send your
+                Rands to your bank account. You will see the status update in
+                your transaction history.
               </p>
             </div>
 
@@ -800,7 +1010,12 @@ export default function DashboardPage() {
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Back
               </Button>
-              <Button fullWidth onClick={handleConvert} isLoading={submitting} disabled={!screenshotFile}>
+              <Button
+                fullWidth
+                onClick={handleConvert}
+                isLoading={submitting}
+                disabled={!screenshotFile}
+              >
                 <Upload className="w-4 h-4 mr-2" />
                 Submit — I am done!
               </Button>
@@ -812,37 +1027,55 @@ export default function DashboardPage() {
       {/* ─── Upload Proof Modal (for existing pending transactions) ─── */}
       <Modal
         isOpen={!!showProof}
-        onClose={() => { setShowProof(null); setProofTxId(""); setProofScreenshot(""); setProofScreenshotName(""); }}
+        onClose={() => {
+          setShowProof(null);
+          setProofTxId("");
+          setProofScreenshot("");
+          setProofScreenshotName("");
+        }}
         title="Upload Payment Proof"
         size="lg"
       >
         <div className="space-y-5">
           <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
             <p className="text-sm text-amber-700 dark:text-amber-300">
-              Upload a screenshot showing you sent the PayPal payment. Without this we cannot process your transaction.
+              Upload a screenshot showing you sent the PayPal payment. Without
+              this we cannot process your transaction.
             </p>
           </div>
 
           {/* Screenshot upload — REQUIRED */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-              📸 Your PayPal payment screenshot <span className="text-red-500">*</span>
+              📸 Your PayPal payment screenshot{" "}
+              <span className="text-red-500">*</span>
             </label>
             <input
               ref={proofFileRef}
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={(e) => handleFileSelect(e, setProofScreenshot, setProofScreenshotName)}
+              onChange={(e) =>
+                handleFileSelect(e, setProofScreenshot, setProofScreenshotName)
+              }
             />
             {proofScreenshot ? (
               <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20">
                 <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300 truncate">{proofScreenshotName}</p>
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400">Screenshot uploaded ✓</p>
+                  <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300 truncate">
+                    {proofScreenshotName}
+                  </p>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                    Screenshot uploaded ✓
+                  </p>
                 </div>
-                <button onClick={() => proofFileRef.current?.click()} className="text-xs text-emerald-600 underline">Change</button>
+                <button
+                  onClick={() => proofFileRef.current?.click()}
+                  className="text-xs text-emerald-600 underline"
+                >
+                  Change
+                </button>
               </div>
             ) : (
               <button
@@ -850,7 +1083,9 @@ export default function DashboardPage() {
                 className="w-full p-6 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-violet-400 transition-colors flex flex-col items-center gap-2 text-gray-400 hover:text-violet-500"
               >
                 <ImageIcon className="w-8 h-8" />
-                <p className="text-sm font-semibold">Tap here to choose your screenshot</p>
+                <p className="text-sm font-semibold">
+                  Tap here to choose your screenshot
+                </p>
                 <p className="text-xs">JPG, PNG — max 5MB</p>
               </button>
             )}
@@ -859,7 +1094,10 @@ export default function DashboardPage() {
           {/* Transaction ID — OPTIONAL */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
-              PayPal Transaction ID <span className="text-gray-400 font-normal">(optional — speeds things up)</span>
+              PayPal Transaction ID{" "}
+              <span className="text-gray-400 font-normal">
+                (optional — speeds things up)
+              </span>
             </label>
             <input
               type="text"
@@ -870,7 +1108,12 @@ export default function DashboardPage() {
             />
           </div>
 
-          <Button fullWidth onClick={handleSubmitProof} isLoading={proofSubmitting} disabled={!proofScreenshot}>
+          <Button
+            fullWidth
+            onClick={handleSubmitProof}
+            isLoading={proofSubmitting}
+            disabled={!proofScreenshot}
+          >
             <Upload className="w-4 h-4 mr-2" />
             Submit Proof
           </Button>
@@ -878,11 +1121,28 @@ export default function DashboardPage() {
       </Modal>
 
       {/* ─── Profile / Bank Details Modal ─── */}
-      <Modal isOpen={showProfile} onClose={() => setShowProfile(false)} title="My Profile & Bank Details" size="lg">
+      <Modal
+        isOpen={showProfile}
+        onClose={() => setShowProfile(false)}
+        title="My Profile & Bank Details"
+        size="lg"
+      >
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Full Name" value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} />
-            <Input label="Phone Number" value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} />
+            <Input
+              label="Full Name"
+              value={profileForm.name}
+              onChange={(e) =>
+                setProfileForm({ ...profileForm, name: e.target.value })
+              }
+            />
+            <Input
+              label="Phone Number"
+              value={profileForm.phone}
+              onChange={(e) =>
+                setProfileForm({ ...profileForm, phone: e.target.value })
+              }
+            />
           </div>
 
           <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
@@ -890,16 +1150,54 @@ export default function DashboardPage() {
               <Building2 className="w-4 h-4" />
               Bank Account Details
             </h4>
-            <p className="text-xs text-gray-500 mb-3">This is where we will send your Rands after verifying your payment.</p>
+            <p className="text-xs text-gray-500 mb-3">
+              This is where we will send your Rands after verifying your
+              payment.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Select label="Your Bank" options={bankOptions} value={profileForm.bankName} onChange={(e) => setProfileForm({ ...profileForm, bankName: e.target.value })} />
-              <Input label="Account Number" value={profileForm.accountNumber} onChange={(e) => setProfileForm({ ...profileForm, accountNumber: e.target.value })} />
-              <Input label="Account Holder Name (exactly as on your bank card)" value={profileForm.accountHolder} onChange={(e) => setProfileForm({ ...profileForm, accountHolder: e.target.value })} />
-              <Input label="Branch Code (optional)" value={profileForm.branchCode} onChange={(e) => setProfileForm({ ...profileForm, branchCode: e.target.value })} />
+              <Select
+                label="Your Bank"
+                options={bankOptions}
+                value={profileForm.bankName}
+                onChange={(e) =>
+                  setProfileForm({ ...profileForm, bankName: e.target.value })
+                }
+              />
+              <Input
+                label="Account Number"
+                value={profileForm.accountNumber}
+                onChange={(e) =>
+                  setProfileForm({
+                    ...profileForm,
+                    accountNumber: e.target.value,
+                  })
+                }
+              />
+              <Input
+                label="Account Holder Name (exactly as on your bank card)"
+                value={profileForm.accountHolder}
+                onChange={(e) =>
+                  setProfileForm({
+                    ...profileForm,
+                    accountHolder: e.target.value,
+                  })
+                }
+              />
+              <Input
+                label="Branch Code (optional)"
+                value={profileForm.branchCode}
+                onChange={(e) =>
+                  setProfileForm({ ...profileForm, branchCode: e.target.value })
+                }
+              />
             </div>
           </div>
 
-          <Button fullWidth onClick={handleSaveProfile} isLoading={profileSaving}>
+          <Button
+            fullWidth
+            onClick={handleSaveProfile}
+            isLoading={profileSaving}
+          >
             Save My Details
           </Button>
         </div>

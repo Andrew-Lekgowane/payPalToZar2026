@@ -178,7 +178,10 @@ export default function AdminPage() {
   const [createForm, setCreateForm] = useState(blankCreate);
   const [userCreating, setUserCreating] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchData = useCallback(async (showToast = false) => {
+    setRefreshing(true);
     try {
       const [txRes, usersRes] = await Promise.all([
         fetch("/api/admin/transactions"),
@@ -188,10 +191,12 @@ export default function AdminPage() {
       const usersData = await usersRes.json();
       if (txData.transactions) setTransactions(txData.transactions);
       if (usersData.users) setUsers(usersData.users);
+      if (showToast) toast.success("Data refreshed");
     } catch {
       toast.error("Failed to load admin data");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -392,11 +397,12 @@ export default function AdminPage() {
               </p>
             </div>
             <button
-              onClick={fetchData}
-              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
-              title="Refresh"
+              onClick={() => fetchData(true)}
+              disabled={refreshing}
+              className="p-2 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/30 disabled:opacity-50 transition-colors"
+              title="Refresh data"
             >
-              <RefreshCw className="w-5 h-5" />
+              <RefreshCw className={`w-5 h-5 ${refreshing ? "animate-spin" : ""}`} />
             </button>
           </div>
 
