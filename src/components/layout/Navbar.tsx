@@ -9,6 +9,8 @@ import Button from "@/components/ui/Button";
 export default function Navbar() {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const isAdmin = (session?.user as { role?: string })?.role === "admin";
+  const dashboardHref = isAdmin ? "/admin" : "/dashboard";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
@@ -41,10 +43,10 @@ export default function Navbar() {
 
             {session ? (
               <div className="flex items-center gap-3">
-                <Link href="/dashboard">
+                <Link href={dashboardHref}>
                   <Button variant="ghost" size="sm">
                     <LayoutDashboard className="w-4 h-4 mr-1.5" />
-                    Dashboard
+                    {isAdmin ? "Admin Panel" : "Dashboard"}
                   </Button>
                 </Link>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800">
@@ -105,11 +107,11 @@ export default function Navbar() {
               {session ? (
                 <>
                   <Link
-                    href="/dashboard"
+                    href={dashboardHref}
                     className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-violet-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                     onClick={() => setMobileOpen(false)}
                   >
-                    Dashboard
+                    {isAdmin ? "Admin Panel" : "Dashboard"}
                   </Link>
                   <button
                     onClick={() => {
