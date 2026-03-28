@@ -1,7 +1,7 @@
 "use client";
 
 import { Home, Clock, ArrowLeftRight, User, LogOut } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { useClerk } from "@clerk/nextjs";
 
 interface BottomNavProps {
   active?: "home" | "history" | "profile";
@@ -16,6 +16,7 @@ export default function BottomNav({
   onProfile,
   onScrollTo,
 }: BottomNavProps) {
+  const { signOut } = useClerk();
   const tab = (label: string, icon: React.ReactNode, isActive: boolean, onClick: () => void) => (
     <button
       onClick={onClick}
@@ -52,7 +53,7 @@ export default function BottomNav({
           "Logout",
           <LogOut className="w-5 h-5" />,
           false,
-          () => signOut({ callbackUrl: "/login" })
+          () => signOut({ redirectUrl: "/login" })
         )}
       </div>
     </div>

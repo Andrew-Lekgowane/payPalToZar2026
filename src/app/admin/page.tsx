@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Users,
@@ -79,6 +79,7 @@ interface AdminUser {
   bankName: string;
   accountNumber: string;
   accountHolder: string;
+  branchCode: string;
   role: string;
   createdAt: string;
 }
@@ -132,7 +133,7 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 }
 
 export default function AdminPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -216,18 +217,18 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!isLoaded) return;
+    if (!user) {
       router.push("/login");
       return;
     }
-    if (status === "authenticated") {
-      if ((session?.user as { role?: string })?.role !== "admin") {
-        router.push("/dashboard");
-        return;
-      }
-      fetchData();
+    const role = user.publicMetadata?.role as string | undefined;
+    if (role !== "admin") {
+      router.push("/dashboard");
+      return;
     }
-  }, [status, session, router, fetchData]);
+    fetchData();
+  }, [isLoaded, user, fetchData, router]);
 
   const updateStatus = async (tx: AdminTransaction, newStatus: string) => {
     setUpdatingStatus(newStatus);
@@ -387,7 +388,7 @@ export default function AdminPage() {
       ? transactions
       : transactions.filter((t) => t.status === statusFilter);
 
-  if (status === "loading" || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex items-center gap-3 text-gray-500">

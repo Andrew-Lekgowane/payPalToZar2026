@@ -1,21 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getDbUser } from "@/lib/getUser";
 import dbConnect from "@/lib/mongodb";
 import User from "@/lib/models/User";
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getDbUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
     await dbConnect();
-
-    const user = await User.findById(session.user.id).select("-password").lean();
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
 
     return NextResponse.json({ user });
   } catch (error: unknown) {
@@ -26,11 +20,10 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const dbUser = await getDbUser();
+    if (!dbUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
     await dbConnect();
 
     const body = await req.json();
@@ -43,9 +36,9 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    const user = await User.findByIdAndUpdate(session.user.id, update, {
+    const user = await User.findByIdAndUpdate(dbUser._id, update, {
       new: true,
-    }).select("-password");
+    });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

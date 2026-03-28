@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getDbUser } from "@/lib/getUser";
 import dbConnect from "@/lib/mongodb";
 import Transaction from "@/lib/models/Transaction";
-import User from "@/lib/models/User";
 
 const EXCHANGE_RATE = parseFloat(process.env.EXCHANGE_RATE || "18.50");
 const SERVICE_FEE_PERCENT = parseFloat(process.env.SERVICE_FEE_PERCENT || "35");
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const dbUser = await getDbUser();
+    if (!dbUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -32,11 +31,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await User.findById(session.user.id);
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
+    const user = dbUser;
     if (!user.bankName || !user.accountNumber || !user.accountHolder) {
       return NextResponse.json(
         { error: "Please update your bank details in your profile before creating a transaction" },
@@ -49,7 +44,7 @@ export async function POST(req: NextRequest) {
     const amountZAR = parseFloat((amountAfterFee * EXCHANGE_RATE).toFixed(2));
 
     const transaction = await Transaction.create({
-      userId: session.user.id,
+      userId: dbUser._id,
       amountUSD,
       exchangeRate: EXCHANGE_RATE,
       serviceFee,
@@ -78,14 +73,14 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const dbUser = await getDbUser();
+    if (!dbUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await dbConnect();
 
-    const transactions = await Transaction.find({ userId: session.user.id })
+    const transactions = await Transaction.find({ userId: dbUser._id })
       .sort({ createdAt: -1 })
       .lean();
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getDbUser } from "@/lib/getUser";
 import dbConnect from "@/lib/mongodb";
 import Transaction from "@/lib/models/Transaction";
 
@@ -8,8 +8,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const dbUser = await getDbUser();
+    if (!dbUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -23,8 +23,8 @@ export async function PATCH(
     }
 
     // Users can only update their own pending transactions
-    const isOwner = transaction.userId.toString() === session.user.id;
-    const isAdmin = (session.user as { role?: string }).role === "admin";
+    const isOwner = transaction.userId.toString() === dbUser._id.toString();
+    const isAdmin = dbUser.role === "admin";
 
     if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

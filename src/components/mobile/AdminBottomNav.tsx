@@ -1,7 +1,7 @@
 "use client";
 
 import { BarChart3, ArrowLeftRight, Users, LogOut } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { useClerk } from "@clerk/nextjs";
 
 interface AdminBottomNavProps {
   active?: "overview" | "transactions" | "users";
@@ -10,6 +10,7 @@ interface AdminBottomNavProps {
 }
 
 export default function AdminBottomNav({ active = "overview", onTabChange, onOverview }: AdminBottomNavProps) {
+  const { signOut } = useClerk();
   const tab = (label: string, icon: React.ReactNode, isActive: boolean, onClick: () => void) => (
     <button
       onClick={onClick}
@@ -30,7 +31,7 @@ export default function AdminBottomNav({ active = "overview", onTabChange, onOve
         {tab("Overview", <BarChart3 className="w-5 h-5" />, active === "overview", onOverview)}
         {tab("Payments", <ArrowLeftRight className="w-5 h-5" />, active === "transactions", () => onTabChange("transactions"))}
         {tab("Users", <Users className="w-5 h-5" />, active === "users", () => onTabChange("users"))}
-        {tab("Logout", <LogOut className="w-5 h-5" />, false, () => signOut({ callbackUrl: "/login" }))}
+        {tab("Logout", <LogOut className="w-5 h-5" />, false, () => signOut({ redirectUrl: "/login" }))}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin } from "@/lib/getUser";
 import dbConnect from "@/lib/mongodb";
 import Transaction from "@/lib/models/Transaction";
 
@@ -8,8 +8,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id || (session.user as { role?: string }).role !== "admin") {
+    const adminUser = await requireAdmin();
+    if (!adminUser) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import {
   DollarSign,
@@ -90,7 +90,7 @@ const statusConfig: Record<
 };
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
   const router = useRouter();
 
   const [transactions, setTransactions] = useState<TransactionData[]>([]);
@@ -160,17 +160,16 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!isLoaded) return;
+    if (!user) {
       router.push("/login");
       return;
     }
-    if (status === "authenticated") {
-      fetchData();
-      // Auto-refresh every 30 seconds so admin status changes appear automatically
-      const interval = setInterval(fetchData, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [status, router, fetchData]);
+    fetchData();
+    // Auto-refresh every 30 seconds so admin status changes appear automatically
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, [isLoaded, user, router, fetchData]);
 
   const resetConvertModal = () => {
     setConvertStep(1);
@@ -351,7 +350,7 @@ export default function DashboardPage() {
         : null
     : null;
 
-  if (status === "loading" || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex items-center gap-3 text-gray-500">
@@ -373,7 +372,7 @@ export default function DashboardPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-8">
             <div>
               <Heading as="h3">
-                Welcome back, {session?.user?.name?.split(" ")[0]} 👋
+                Welcome back, {user?.firstName || user?.fullName?.split(" ")[0] || "there"} 👋
               </Heading>
               <p className="text-gray-500 mt-1">
                 Convert your PayPal money to Rands — fast and easy
@@ -738,7 +737,7 @@ export default function DashboardPage() {
           {/* Hero balance card */}
           <div className="rounded-3xl bg-linear-to-br from-violet-600 via-violet-700 to-indigo-800 p-5 text-white shadow-xl shadow-violet-500/25">
             <p className="text-xs font-medium opacity-70 mb-0.5">
-              Hi {session?.user?.name?.split(" ")[0]} 👋
+              Hi {user?.firstName || user?.fullName?.split(" ")[0] || "there"} 👋
             </p>
             <p className="text-xs opacity-50 mb-1">Total Received</p>
             <p className="text-3xl font-black tracking-tight">

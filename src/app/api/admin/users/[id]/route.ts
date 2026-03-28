@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin } from "@/lib/getUser";
+import { clerkClient } from "@clerk/nextjs/server";
 import dbConnect from "@/lib/mongodb";
 import User from "@/lib/models/User";
-import bcrypt from "bcryptjs";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id || (session.user as { role?: string }).role !== "admin") {
+    const adminUser = await requireAdmin();
+    if (!adminUser) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -18,15 +18,18 @@ export async function PATCH(
     const { id } = await params;
     const body = await req.json();
 
-    const { name, email, phone, bankName, accountNumber, accountHolder, branchCode, role, password } = body;
+    const { name, email, phone, bankName, accountNumber, accountHolder, branchCode, role } = body;
 
     // Validate role if provided
     if (role && !["user", "admin"].includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    // Prevent admin from demoting themselves
-    if (id === session.user.id && role && role !== "admin") {
+    const targetUser = await User.findById(id);
+    if (!targetUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+    if (targetUser.clerkId === adminUser.id && role && role !== "admin") {
       return NextResponse.json({ error: "Cannot change your own role" }, { status: 400 });
     }
 
@@ -49,16 +52,20 @@ export async function PATCH(
     if (branchCode  !== undefined) updateFields.branchCode   = branchCode;
     if (role)          updateFields.role          = role;
 
-    // Hash new password if provided
-    if (password && password.trim().length >= 6) {
-      updateFields.password = await bcrypt.hash(password.trim(), 12);
+    // Sync role to Clerk publicMetadata if role is being changed
+    if (role && targetUser) {
+      try {
+        await (await clerkClient()).users.updateUser(targetUser.clerkId, {
+          publicMetadata: { role },
+        });
+      } catch { /* non-fatal */ }
     }
 
     const updated = await User.findByIdAndUpdate(
       id,
       { $set: updateFields },
       { new: true, runValidators: true }
-    ).select("-password");
+    );
 
     if (!updated) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -76,22 +83,28 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id || (session.user as { role?: string }).role !== "admin") {
+    const adminUser = await requireAdmin();
+    if (!adminUser) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await dbConnect();
     const { id } = await params;
 
-    if (id === session.user.id) {
+    const targetForDelete = await User.findById(id);
+    if (!targetForDelete) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+    if (targetForDelete.clerkId === adminUser.id) {
       return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
     }
 
-    const deleted = await User.findByIdAndDelete(id);
-    if (!deleted) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    // Delete from Clerk
+    try {
+      await (await clerkClient()).users.deleteUser(targetForDelete.clerkId);
+    } catch { /* user may not exist in Clerk */ }
+
+    await User.findByIdAndDelete(id);
 
     return NextResponse.json({ message: "User deleted" });
   } catch (error: unknown) {
