@@ -42,6 +42,7 @@ interface TransactionData {
   serviceFee: number;
   status: string;
   paypalTransactionId: string;
+  proofScreenshot?: string;
   createdAt: string;
 }
 
@@ -592,9 +593,10 @@ export default function DashboardPage() {
                         >
                           View Details
                         </button>
-                        {(tx.status === "pending" ||
-                          (tx.status === "verifying" &&
-                            !tx.paypalTransactionId)) && (
+                        {!tx.proofScreenshot &&
+                          (tx.status === "pending" ||
+                            (tx.status === "verifying" &&
+                              !tx.paypalTransactionId)) && (
                           <button
                             onClick={() => {
                               setShowProof(tx._id);
@@ -606,6 +608,11 @@ export default function DashboardPage() {
                           >
                             Upload Proof
                           </button>
+                        )}
+                        {tx.proofScreenshot && (
+                          <span className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-emerald-600 border border-emerald-200 dark:border-emerald-800 text-center">
+                            ✓ Proof Submitted
+                          </span>
                         )}
                       </div>
                     </div>
@@ -670,9 +677,10 @@ export default function DashboardPage() {
                             >
                               <Eye className="w-4 h-4" />
                             </button>
-                            {(tx.status === "pending" ||
-                              (tx.status === "verifying" &&
-                                !tx.paypalTransactionId)) && (
+                            {!tx.proofScreenshot &&
+                              (tx.status === "pending" ||
+                                (tx.status === "verifying" &&
+                                  !tx.paypalTransactionId)) && (
                               <button
                                 onClick={() => {
                                   setShowProof(tx._id);
@@ -684,6 +692,11 @@ export default function DashboardPage() {
                               >
                                 Upload Proof
                               </button>
+                            )}
+                            {tx.proofScreenshot && (
+                              <span className="text-xs font-semibold text-emerald-600 whitespace-nowrap">
+                                ✓ Proof sent
+                              </span>
                             )}
                           </td>
                         </tr>
@@ -925,7 +938,19 @@ export default function DashboardPage() {
                 {selectedTx.paypalTransactionId || "Not provided"}
               </p>
             </div>
-            {(selectedTx.status === "pending" ||
+            {selectedTx.proofScreenshot ? (
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                    Payment proof already submitted
+                  </p>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                    You cannot re-upload once a screenshot has been sent
+                  </p>
+                </div>
+              </div>
+            ) : (selectedTx.status === "pending" ||
               (selectedTx.status === "verifying" &&
                 !selectedTx.paypalTransactionId)) && (
               <Button
