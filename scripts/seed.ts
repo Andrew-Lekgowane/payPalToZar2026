@@ -44,7 +44,7 @@ const SEED_USERS = [
   {
     firstName:     "Andrew",
     lastName:      "Lekgowane",
-    email:         "andrew@annathanpay.co.za",
+    email:         "lekgowanek@promilezi.co.za",
     password:      "Annathan@Admin1",
     phone:         "0821111111",
     role:          "admin" as const,
@@ -129,6 +129,7 @@ async function main() {
   // Also clean up the old legacy emails that won't be re-created
   const legacyEmails = [
     "admin@annathanpay.co.za",
+    "andrew@annathanpay.co.za",
     "user@example.com",
     "motau@gmail.com",
   ];
@@ -195,7 +196,7 @@ async function main() {
   console.log("─────────────────────────────────────────────────────");
   console.log("🎉  Seeding complete!\n");
   console.log("ADMINS");
-  console.log("  andrew@annathanpay.co.za  │  Annathan@Admin1");
+  console.log("  lekgowanek@promilezi.co.za  │  Annathan@Admin1");
   console.log("  sarah@annathanpay.co.za   │  Annathan@Admin2");
   console.log("\nUSERS");
   console.log("  thabo@example.com         │  Annathan@User1");
