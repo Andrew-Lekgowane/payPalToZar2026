@@ -29,7 +29,7 @@ export async function PATCH(
     if (!targetUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    if (targetUser.clerkId === adminUser.id && role && role !== "admin") {
+    if (targetUser.clerkId === adminUser.clerkId && role && role !== "admin") {
       return NextResponse.json({ error: "Cannot change your own role" }, { status: 400 });
     }
 
@@ -64,7 +64,7 @@ export async function PATCH(
     const updated = await User.findByIdAndUpdate(
       id,
       { $set: updateFields },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updated) {
@@ -95,7 +95,7 @@ export async function DELETE(
     if (!targetForDelete) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    if (targetForDelete.clerkId === adminUser.id) {
+    if (targetForDelete.clerkId === adminUser.clerkId) {
       return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
     }
 

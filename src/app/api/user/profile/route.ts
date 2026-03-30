@@ -37,7 +37,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const user = await User.findByIdAndUpdate(dbUser._id, update, {
-      new: true,
+      returnDocument: 'after',
     });
 
     if (!user) {

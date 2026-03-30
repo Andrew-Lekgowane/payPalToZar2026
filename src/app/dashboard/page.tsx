@@ -165,6 +165,12 @@ export default function DashboardPage() {
       router.push("/login");
       return;
     }
+    // Admins landing here (e.g. direct link) get bounced to /admin immediately
+    const role = user.publicMetadata?.role as string | undefined;
+    if (role === "admin") {
+      router.replace("/admin");
+      return;
+    }
     fetchData();
     // Auto-refresh every 30 seconds so admin status changes appear automatically
     const interval = setInterval(fetchData, 30000);
@@ -350,7 +356,11 @@ export default function DashboardPage() {
         : null
     : null;
 
-  if (!isLoaded || loading) {
+  // Only block render until Clerk has initialised (very fast — happens client-side).
+  // Once isLoaded is true we know who the user is and can show the page shell.
+  // The data-loading state is handled inline with skeletons so the page feels
+  // instant and we never show the "Rendering" banner again.
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex items-center gap-3 text-gray-500">
