@@ -46,13 +46,13 @@ export async function PATCH(
       if (body.paypalTransactionId || body.proofScreenshot) {
         update.status = "verifying";
       }
-      const updated = await Transaction.findByIdAndUpdate(id, update, { new: true });
+      const updated = await Transaction.findByIdAndUpdate(id, update, { returnDocument: 'after' });
       return NextResponse.json({ transaction: updated });
     }
 
     // Admin can update anything
     if (isAdmin) {
-      const updated = await Transaction.findByIdAndUpdate(id, body, { new: true });
+      const updated = await Transaction.findByIdAndUpdate(id, body, { returnDocument: 'after' });
       return NextResponse.json({ transaction: updated });
     }
 

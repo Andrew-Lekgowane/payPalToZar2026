@@ -24,7 +24,7 @@ export async function PATCH(
     const updated = await Transaction.findByIdAndUpdate(
       id,
       { $set: allowedFields },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updated) {

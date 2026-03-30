@@ -36,7 +36,7 @@ export async function getDbUser() {
     const legacy = await User.findOneAndUpdate(
       { email, clerkId: { $exists: false } },
       { $set: { clerkId: userId } },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (legacy) return legacy;
   }
