@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -132,7 +132,7 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
   );
 }
 
-export default function AdminPage() {
+function AdminPageInner() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1663,5 +1663,13 @@ export default function AdminPage() {
         </div>
       )}
     </>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminPageInner />
+    </Suspense>
   );
 }
