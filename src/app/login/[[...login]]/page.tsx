@@ -1,6 +1,6 @@
-import { SignUp } from "@clerk/nextjs";
+import { SignIn } from "@clerk/nextjs";
 
-export default function RegisterPage() {
+export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
@@ -11,11 +11,12 @@ export default function RegisterPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-black text-gray-900 dark:text-white">Annathan Pay</h1>
-          <p className="text-sm text-gray-500 mt-1">Create your account</p>
+          <p className="text-sm text-gray-500 mt-1">Sign in to your account</p>
         </div>
-        <SignUp
-          routing="hash"
-          signInUrl="/login"
+        <SignIn
+          routing="path"
+          path="/login"
+          signUpUrl="/register"
           fallbackRedirectUrl="/auth-redirect"
           appearance={{
             variables: { colorPrimary: "#7c3aed", borderRadius: "0.75rem" },
@@ -23,6 +24,7 @@ export default function RegisterPage() {
               card: "shadow-xl shadow-violet-500/10 border border-gray-100",
               headerTitle: "hidden",
               headerSubtitle: "hidden",
+              socialButtonsBlockButton: "border border-gray-200 hover:border-violet-300",
             },
           }}
         />

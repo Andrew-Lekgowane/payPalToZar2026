@@ -7,6 +7,9 @@ import { Toaster } from "react-hot-toast";
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
+      signInUrl="/login"
+      signUpUrl="/register"
+      afterSignOutUrl="/login"
       appearance={{
         variables: {
           colorPrimary: "#7c3aed",
