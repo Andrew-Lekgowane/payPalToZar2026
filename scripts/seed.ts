@@ -1,6 +1,7 @@
 /**
  * Annathan Pay — Database Seeder
- * Creates 2 admin accounts and 2 user accounts in both Clerk and MongoDB.
+ * Wipes all existing users from MongoDB + Clerk, then creates
+ * 2 admin accounts and 2 user accounts fresh.
  *
  * Run with:
  *   npx ts-node --skip-project scripts/seed.ts
@@ -44,7 +45,7 @@ const SEED_USERS = [
     firstName:     "Andrew",
     lastName:      "Lekgowane",
     email:         "andrew@annathanpay.co.za",
-    password:      "Admin@1234",
+    password:      "Annathan@Admin1",
     phone:         "0821111111",
     role:          "admin" as const,
     bankName:      "FNB",
@@ -56,7 +57,7 @@ const SEED_USERS = [
     firstName:     "Sarah",
     lastName:      "Mokoena",
     email:         "sarah@annathanpay.co.za",
-    password:      "Admin@1234",
+    password:      "Annathan@Admin2",
     phone:         "0822222222",
     role:          "admin" as const,
     bankName:      "Standard Bank",
@@ -69,7 +70,7 @@ const SEED_USERS = [
     firstName:     "Thabo",
     lastName:      "Dlamini",
     email:         "thabo@example.com",
-    password:      "User@1234",
+    password:      "Annathan@User1",
     phone:         "0833333333",
     role:          "user" as const,
     bankName:      "Capitec",
@@ -81,7 +82,7 @@ const SEED_USERS = [
     firstName:     "Precious",
     lastName:      "Nkosi",
     email:         "precious@example.com",
-    password:      "User@1234",
+    password:      "Annathan@User2",
     phone:         "0844444444",
     role:          "user" as const,
     bankName:      "Absa",
@@ -93,17 +94,17 @@ const SEED_USERS = [
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function deleteExistingClerkUser(email: string) {
+async function deleteAllClerkUsersForEmail(email: string) {
   try {
     const { data: existing } = await clerk.users.getUserList({
       emailAddress: [email],
     });
     for (const u of existing) {
       await clerk.users.deleteUser(u.id);
-      console.log(`   🗑  Deleted existing Clerk user: ${email}`);
+      console.log(`   🗑  Deleted Clerk user: ${email} (${u.id})`);
     }
   } catch {
-    // Not found — that's fine
+    // Ignore — not found is fine
   }
 }
 
@@ -115,30 +116,48 @@ async function main() {
   await mongoose.connect(uri);
   console.log("✅ Connected to MongoDB:", uri);
 
-  console.log("\n🌱 Seeding users...\n");
+  // ── Step 1: Wipe ALL existing users from MongoDB ───────────────────────────
+  console.log("\n🧹 Wiping all existing users from MongoDB...");
+  const deleted = await User.deleteMany({});
+  console.log(`   ✅ Deleted ${deleted.deletedCount} user(s)\n`);
+
+  // ── Step 2: Delete matching Clerk accounts ─────────────────────────────────
+  console.log("🧹 Removing existing Clerk accounts...");
+  for (const seed of SEED_USERS) {
+    await deleteAllClerkUsersForEmail(seed.email);
+  }
+  // Also clean up the old legacy emails that won't be re-created
+  const legacyEmails = [
+    "admin@annathanpay.co.za",
+    "user@example.com",
+    "motau@gmail.com",
+  ];
+  for (const email of legacyEmails) {
+    await deleteAllClerkUsersForEmail(email);
+  }
+  console.log();
+
+  // ── Step 3: Create fresh users ─────────────────────────────────────────────
+  console.log("🌱 Seeding fresh users...\n");
 
   for (const seed of SEED_USERS) {
     const fullName = `${seed.firstName} ${seed.lastName}`;
     console.log(`👤 Creating [${seed.role.toUpperCase()}] ${fullName} <${seed.email}>`);
 
-    // 1. Remove any existing Clerk account with this email (idempotent)
-    await deleteExistingClerkUser(seed.email);
-
-    // 2. Create the Clerk account
+    // Create the Clerk account
     let clerkUser;
     try {
       clerkUser = await clerk.users.createUser({
-        firstName:    seed.firstName,
-        lastName:     seed.lastName,
-        username:     `${seed.firstName}${seed.lastName}`.toLowerCase(),
-        emailAddress: [seed.email],
-        password:     seed.password,
+        firstName:      seed.firstName,
+        lastName:       seed.lastName,
+        username:       `${seed.firstName}${seed.lastName}`.toLowerCase(),
+        emailAddress:   [seed.email],
+        password:       seed.password,
         publicMetadata: { role: seed.role },
         skipPasswordChecks: true,
       });
       console.log(`   ✅ Clerk account created  (id: ${clerkUser.id})`);
     } catch (err: unknown) {
-      // Log full Clerk error details
       if (err && typeof err === "object" && "errors" in err) {
         const clerkErr = err as { errors: Array<{ message: string; longMessage?: string; code: string }> };
         clerkErr.errors?.forEach((e) =>
@@ -150,24 +169,20 @@ async function main() {
       continue;
     }
 
-    // 3. Upsert the MongoDB profile
+    // Create the MongoDB profile
     try {
-      await User.findOneAndUpdate(
-        { email: seed.email.toLowerCase() },
-        {
-          clerkId:       clerkUser.id,
-          name:          fullName,
-          email:         seed.email.toLowerCase(),
-          phone:         seed.phone,
-          role:          seed.role,
-          bankName:      seed.bankName,
-          accountNumber: seed.accountNumber,
-          accountHolder: seed.accountHolder,
-          branchCode:    seed.branchCode,
-        },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      );
-      console.log(`   ✅ MongoDB profile saved`);
+      await User.create({
+        clerkId:       clerkUser.id,
+        name:          fullName,
+        email:         seed.email.toLowerCase(),
+        phone:         seed.phone,
+        role:          seed.role,
+        bankName:      seed.bankName,
+        accountNumber: seed.accountNumber,
+        accountHolder: seed.accountHolder,
+        branchCode:    seed.branchCode,
+      });
+      console.log(`   ✅ MongoDB profile created`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`   ❌ MongoDB error: ${msg}`);
@@ -177,15 +192,15 @@ async function main() {
   }
 
   // ─── Summary ───────────────────────────────────────────────────────────────
-  console.log("─────────────────────────────────────────────────");
+  console.log("─────────────────────────────────────────────────────");
   console.log("🎉  Seeding complete!\n");
   console.log("ADMINS");
-  console.log("  andrew@annathanpay.co.za  │  Admin@1234");
-  console.log("  sarah@annathanpay.co.za   │  Admin@1234");
+  console.log("  andrew@annathanpay.co.za  │  Annathan@Admin1");
+  console.log("  sarah@annathanpay.co.za   │  Annathan@Admin2");
   console.log("\nUSERS");
-  console.log("  thabo@example.com         │  User@1234");
-  console.log("  precious@example.com      │  User@1234");
-  console.log("─────────────────────────────────────────────────");
+  console.log("  thabo@example.com         │  Annathan@User1");
+  console.log("  precious@example.com      │  Annathan@User2");
+  console.log("─────────────────────────────────────────────────────");
 
   await mongoose.disconnect();
   process.exit(0);
