@@ -44,7 +44,7 @@ const SEED_USERS = [
   {
     firstName:     "Andrew",
     lastName:      "Lekgowane",
-    email:         "lekgowanek@promilezi.co.za",
+    email:         "lekgowanek+admin1@promilezi.co.za",
     password:      "Annathan@Admin1",
     phone:         "0821111111",
     role:          "admin" as const,
@@ -56,7 +56,7 @@ const SEED_USERS = [
   {
     firstName:     "Sarah",
     lastName:      "Mokoena",
-    email:         "sarah@annathanpay.co.za",
+    email:         "lekgowanek+admin2@promilezi.co.za",
     password:      "Annathan@Admin2",
     phone:         "0822222222",
     role:          "admin" as const,
@@ -69,7 +69,7 @@ const SEED_USERS = [
   {
     firstName:     "Thabo",
     lastName:      "Dlamini",
-    email:         "thabo@example.com",
+    email:         "lekgowanek+user1@promilezi.co.za",
     password:      "Annathan@User1",
     phone:         "0833333333",
     role:          "user" as const,
@@ -81,7 +81,7 @@ const SEED_USERS = [
   {
     firstName:     "Precious",
     lastName:      "Nkosi",
-    email:         "precious@example.com",
+    email:         "lekgowanek+user2@promilezi.co.za",
     password:      "Annathan@User2",
     phone:         "0844444444",
     role:          "user" as const,
@@ -130,6 +130,10 @@ async function main() {
   const legacyEmails = [
     "admin@annathanpay.co.za",
     "andrew@annathanpay.co.za",
+    "sarah@annathanpay.co.za",
+    "thabo@example.com",
+    "precious@example.com",
+    "lekgowanek@promilezi.co.za",
     "user@example.com",
     "motau@gmail.com",
   ];
@@ -196,11 +200,11 @@ async function main() {
   console.log("─────────────────────────────────────────────────────");
   console.log("🎉  Seeding complete!\n");
   console.log("ADMINS");
-  console.log("  lekgowanek@promilezi.co.za  │  Annathan@Admin1");
-  console.log("  sarah@annathanpay.co.za   │  Annathan@Admin2");
+  console.log("  lekgowanek+admin1@promilezi.co.za  │  Annathan@Admin1");
+  console.log("  lekgowanek+admin2@promilezi.co.za  │  Annathan@Admin2");
   console.log("\nUSERS");
-  console.log("  thabo@example.com         │  Annathan@User1");
-  console.log("  precious@example.com      │  Annathan@User2");
+  console.log("  lekgowanek+user1@promilezi.co.za   │  Annathan@User1");
+  console.log("  lekgowanek+user2@promilezi.co.za   │  Annathan@User2");
   console.log("─────────────────────────────────────────────────────");
 
   await mongoose.disconnect();
