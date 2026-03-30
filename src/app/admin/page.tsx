@@ -1120,6 +1120,7 @@ function AdminPageInner() {
           active={tab === "transactions" ? "transactions" : tab === "users" ? "users" : "overview"}
           onTabChange={(t) => setTab(t)}
           onOverview={() => { setTab("transactions"); setStatusFilter("all"); }}
+          onAnalytics={() => router.push("/admin/analytics")}
         />
       </div>{/* end mobile */}
 

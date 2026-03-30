@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useUser, useClerk } from "@clerk/nextjs";
 import {
   Menu, X, Zap, LogOut, LayoutDashboard, User,
-  ArrowRightLeft, Users, RefreshCw, ShieldCheck,
+  ArrowRightLeft, Users, RefreshCw, ShieldCheck, TrendingUp,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 
@@ -41,6 +41,9 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             {isLoaded && isAdmin ? (
               <>
+                <Link href="/admin/analytics" className={navLink}>
+                  <span className="flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" />Analytics</span>
+                </Link>
                 <Link href="/admin?tab=transactions" className={navLink}>
                   <span className="flex items-center gap-1.5"><ArrowRightLeft className="w-3.5 h-3.5" />Transactions</span>
                 </Link>
@@ -97,6 +100,7 @@ export default function Navbar() {
               {isAdmin ? (
                 <>
                   <p className="px-3 py-1 text-xs font-bold text-gray-400 uppercase tracking-widest">Admin</p>
+                  <Link href="/admin/analytics" className={mobileLink} onClick={() => setMobileOpen(false)}><TrendingUp className="w-4 h-4 text-violet-500" />Analytics</Link>
                   <Link href="/admin?tab=transactions" className={mobileLink} onClick={() => setMobileOpen(false)}><ArrowRightLeft className="w-4 h-4 text-violet-500" />Transactions</Link>
                   <Link href="/admin?tab=users" className={mobileLink} onClick={() => setMobileOpen(false)}><Users className="w-4 h-4 text-violet-500" />Users</Link>
                 </>

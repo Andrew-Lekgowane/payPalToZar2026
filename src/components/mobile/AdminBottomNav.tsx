@@ -1,24 +1,27 @@
 "use client";
 
-import { BarChart3, ArrowLeftRight, Users, LogOut } from "lucide-react";
+import React from "react";
+import { BarChart3, ArrowLeftRight, Users, LogOut, TrendingUp } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
 
 interface AdminBottomNavProps {
-  active?: "overview" | "transactions" | "users";
+  active?: "overview" | "transactions" | "users" | "analytics";
   onTabChange: (tab: "transactions" | "users") => void;
   onOverview: () => void;
+  onAnalytics?: () => void;
 }
 
-export default function AdminBottomNav({ active = "overview", onTabChange, onOverview }: AdminBottomNavProps) {
+export default function AdminBottomNav({
+  active = "overview",
+  onTabChange,
+  onOverview,
+  onAnalytics,
+}: AdminBottomNavProps) {
   const { signOut } = useClerk();
+
   const tab = (label: string, icon: React.ReactNode, isActive: boolean, onClick: () => void) => (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1"
-    >
-      <span className={`${isActive ? "text-violet-600 dark:text-violet-400" : "text-gray-400"}`}>
-        {icon}
-      </span>
+    <button onClick={onClick} className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1">
+      <span className={isActive ? "text-violet-600 dark:text-violet-400" : "text-gray-400"}>{icon}</span>
       <span className={`text-[10px] font-semibold ${isActive ? "text-violet-600 dark:text-violet-400" : "text-gray-400"}`}>
         {label}
       </span>
@@ -28,10 +31,11 @@ export default function AdminBottomNav({ active = "overview", onTabChange, onOve
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
       <div className="flex items-center justify-around px-2 pt-1 pb-3">
-        {tab("Overview", <BarChart3 className="w-5 h-5" />, active === "overview", onOverview)}
-        {tab("Payments", <ArrowLeftRight className="w-5 h-5" />, active === "transactions", () => onTabChange("transactions"))}
-        {tab("Users", <Users className="w-5 h-5" />, active === "users", () => onTabChange("users"))}
-        {tab("Logout", <LogOut className="w-5 h-5" />, false, () => signOut({ redirectUrl: "/login" }))}
+        {tab("Overview",  <BarChart3 className="w-5 h-5" />,       active === "overview",   onOverview)}
+        {tab("Analytics", <TrendingUp className="w-5 h-5" />,      active === "analytics",  () => onAnalytics?.())}
+        {tab("Payments",  <ArrowLeftRight className="w-5 h-5" />,  active === "transactions", () => onTabChange("transactions"))}
+        {tab("Users",     <Users className="w-5 h-5" />,           active === "users",      () => onTabChange("users"))}
+        {tab("Logout",    <LogOut className="w-5 h-5" />,          false,                   () => signOut({ redirectUrl: "/login" }))}
       </div>
     </div>
   );
