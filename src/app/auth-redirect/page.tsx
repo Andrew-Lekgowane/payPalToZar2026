@@ -1,9 +1,13 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
+/**
+ * Legacy fallback — the primary login flow now goes straight to /dashboard.
+ * If someone hits this URL directly, bounce them based on their auth state.
+ */
 export default async function AuthRedirectPage() {
-  const user = await currentUser();
-  if (!user) redirect("/login");
-  const role = user.publicMetadata?.role as string | undefined;
-  redirect(role === "admin" ? "/admin" : "/dashboard");
+  const { userId } = await auth();
+  if (!userId) redirect("/login");
+  // Dashboard's useEffect handles the admin → /admin redirect client-side
+  redirect("/dashboard");
 }

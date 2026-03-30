@@ -388,7 +388,10 @@ export default function AdminPage() {
       ? transactions
       : transactions.filter((t) => t.status === statusFilter);
 
-  if (!isLoaded || loading) {
+  // Only block render until Clerk has initialised (very fast — happens client-side).
+  // Data-loading is handled inline so the page shell appears immediately without
+  // triggering the "Rendering" badge in Next.js.
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex items-center gap-3 text-gray-500">

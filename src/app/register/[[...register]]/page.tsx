@@ -17,7 +17,7 @@ export default function RegisterPage() {
           routing="path"
           path="/register"
           signInUrl="/login"
-          fallbackRedirectUrl="/auth-redirect"
+          fallbackRedirectUrl="/dashboard"
           appearance={{
             variables: { colorPrimary: "#7c3aed", borderRadius: "0.75rem" },
             elements: {
